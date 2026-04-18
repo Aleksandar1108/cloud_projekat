@@ -94,7 +94,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         login,
         logout,
         isAuthenticated: !!user && !!token,
-        isLoading: false, // više ne postoji potreba
+        isLoading: false, 
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
