@@ -1,7 +1,7 @@
 import { Navigate, useNavigate } from "react-router-dom";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useAuth } from "../../hooks/auth/useAuthHook";
-import { AuthAPIService } from "../../api_services/AuthAPIService";
+import { AuthAPIService } from "../../api_services/auth/AuthAPIService";
 import type { LoginUserDTO } from "../../models/auth/LoginUserDTO";
 import LoginForm from "../../components/auth/LoginForm";
 

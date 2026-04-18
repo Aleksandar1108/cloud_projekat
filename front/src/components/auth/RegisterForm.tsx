@@ -1,25 +1,40 @@
-import type { AuthFormProps } from "../../types/auth/AuthFormProps";
+import type { FieldErrors, UseFormHandleSubmit, UseFormRegister, SubmitHandler, UseFormWatch, UseFormSetValue } from "react-hook-form";
 
+type RegisterFormData = {
+    email: string;
+    password: string;
+    confirmPassword: string;
+};
 
+type RegisterFormProps = {
+    handleSubmit: UseFormHandleSubmit<RegisterFormData>;
+    onSubmit: SubmitHandler<RegisterFormData>;
+    register: UseFormRegister<RegisterFormData>;
+    errors: FieldErrors<RegisterFormData>;
+    watch: UseFormWatch<RegisterFormData>;
+    setValue: UseFormSetValue<RegisterFormData>;
+};
 
-export default function LoginForm({ handleSubmit, onSubmit, register, errors }: AuthFormProps) {
+export default function RegisterForm({ handleSubmit, onSubmit, register, errors, watch, setValue }: RegisterFormProps) {
+    const password = watch("password");
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}
             style={{
-                display: "flex",
-                flexDirection: "column",
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr auto",
                 gap: "18px",
                 width: "100%",
-                maxWidth: "360px",
+                maxWidth: "100%",
                 margin: "0 auto",
                 padding: "24px",
                 backgroundColor: "rgba(46, 110, 182, 0.06)",
                 borderRadius: "12px",
                 boxShadow: "0 6px 18px rgba(46, 110, 182, 0.12)",
+                alignItems: "end",
             }}
         >
-            <div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                 <label
                     htmlFor="email"
                     style={{
@@ -27,7 +42,6 @@ export default function LoginForm({ handleSubmit, onSubmit, register, errors }: 
                         fontSize: "14px",
                         color: "var(--secondary)",
                         fontWeight: 600,
-                        marginBottom: "6px",
                     }}
                 >
                     Email address
@@ -36,7 +50,7 @@ export default function LoginForm({ handleSubmit, onSubmit, register, errors }: 
                     id="email"
                     type="email"
                     {...register("email", { required: true })}
-                    placeholder="Enter your email"
+                    placeholder="Enter users email"
                     style={{
                         width: "100%",
                         padding: "12px 14px",
@@ -61,7 +75,7 @@ export default function LoginForm({ handleSubmit, onSubmit, register, errors }: 
                 )}
             </div>
 
-            <div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                 <label
                     htmlFor="password"
                     style={{
@@ -69,7 +83,6 @@ export default function LoginForm({ handleSubmit, onSubmit, register, errors }: 
                         fontSize: "14px",
                         color: "var(--secondary)",
                         fontWeight: 600,
-                        marginBottom: "6px",
                     }}
                 >
                     Password
@@ -78,7 +91,7 @@ export default function LoginForm({ handleSubmit, onSubmit, register, errors }: 
                     id="password"
                     type="password"
                     {...register("password", { required: true })}
-                    placeholder="Enter your password"
+                    placeholder="Enter users password"
                     style={{
                         width: "100%",
                         padding: "12px 14px",
@@ -103,21 +116,62 @@ export default function LoginForm({ handleSubmit, onSubmit, register, errors }: 
                 )}
             </div>
 
-            
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <label
+                    htmlFor="repeat-password"
+                    style={{
+                        display: "block",
+                        fontSize: "14px",
+                        color: "var(--secondary)",
+                        fontWeight: 600,
+                    }}
+                >
+                    Confirm Password
+                </label>
+                <input
+                    id="repeat-password"
+                    type="password"
+                    {...register("confirmPassword", {
+                        required: "Confirm password is required",
+                        validate: (value) => value === password || "Passwords don't match"
+                    })}
+                    onBlur={() => {
+                        const confirmValue = watch("confirmPassword");
+                        if (confirmValue && confirmValue !== password) {
+                            setValue("confirmPassword", "");
+                        }
+                    }}
+                    placeholder={errors.confirmPassword ? "Passwords don't match" : "Confirm your password"}
+                    style={{
+                        width: "100%",
+                        padding: "12px 14px",
+                        borderRadius: "8px",
+                        border: errors.confirmPassword ? "1px solid #dc2626" : "1px solid rgba(46, 110, 182, 0.45)",
+                        backgroundColor: "#fff",
+                        color: "var(--gray-900)",
+                        boxSizing: "border-box",
+                    }}
+                />
+                {errors.confirmPassword && errors.confirmPassword.type !== "validate"}
+            </div>
+
             <input
                 type="submit"
-                value="Login"
+                value="Register user"
                 style={{
                     backgroundColor: "var(--secondary)",
                     color: "var(--white)",
                     border: "none",
-                    padding: "12px 18px",
+                    padding: "14px 18px",
                     borderRadius: "8px",
                     cursor: "pointer",
                     fontSize: "16px",
                     fontWeight: 700,
+                    justifySelf: "stretch",
                 }}
-            />
+            >
+            </input>
         </form>
     );
 }
+        
