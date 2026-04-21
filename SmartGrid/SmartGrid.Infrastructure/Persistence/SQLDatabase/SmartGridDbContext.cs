@@ -16,13 +16,13 @@ public class SmartGridDbContext : DbContext
 
         modelBuilder.Entity<UserEntity>(entity =>
         {
-            entity.HasKey(e => e.Id);
+            entity.HasKey(e => e.IdUsers);
 
             entity.Property(e => e.Email)
                   .IsRequired()
                   .HasMaxLength(100);
 
-            entity.Property(e => e.PasswordHash)
+            entity.Property(e => e.Password)
                   .IsRequired();
 
             entity.Property(e => e.Role)

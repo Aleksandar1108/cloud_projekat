@@ -10,7 +10,7 @@ type RegisterFormData = {
     confirmPassword: string;
 };
 
-function UsersPage(){
+function UsersPage() {
     const navigate = useNavigate();
     const { isAuthenticated, login } = useAuth();
     const {
@@ -26,12 +26,11 @@ function UsersPage(){
         const response = await AuthAPIService.register(data.email, data.password);
 
         if (response.token) {
-            login(response.token);
-            navigate("/");
+            alert("User registered successfully!");
         } else {
-            console.error("Registration failed:", response.error ?? response.message);
+            alert("Registration failed: " + (response.error || response.message));
         }
-        
+
         reset();
     };
 

@@ -34,5 +34,16 @@ namespace SmartGrid.Domain.Models
             Password = password;
             AccountCreated = accountCreated;
         }
+
+        public static User Create(string email, string password)
+        {
+            return new User(
+                UserId.New(),
+                Email.Create(email).Value,
+                Domain.Enums.UserRole.User,
+                PasswordHash.FromPlainPassword(password),
+                DateTime.UtcNow
+            );
+        }
     }
 }

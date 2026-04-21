@@ -25,7 +25,7 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories
         {
             var entity = await _context.Users
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == id.Value.ToString());
+                .FirstOrDefaultAsync(x => x.IdUsers == id.Value.ToString());
 
             return entity is null ? null : _userMapper.ToDomain(entity);
         }
@@ -58,13 +58,13 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories
         public async Task UpdateAsync(User user)
         {
             var entity = await _context.Users
-                .FirstOrDefaultAsync(x => x.Id == user.Id.Value.ToString());
+                .FirstOrDefaultAsync(x => x.IdUsers == user.Id.Value.ToString());
 
             if (entity is null)
                 return;
 
-            entity.Email = user.Email;
-            entity.PasswordHash = user.Password.Value;
+            entity.Email = user.Email.Value;
+            entity.Password = user.Password.Value;
             entity.Role = user.Role.ToString();
 
             _context.Users.Update(entity);
@@ -74,7 +74,7 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories
         public async Task DeleteAsync(UserId id)
         {
             var entity = await _context.Users
-                .FirstOrDefaultAsync(x => x.Id == id.Value.ToString());
+                .FirstOrDefaultAsync(x => x.IdUsers == id.Value.ToString());
 
             if (entity is null)
                 return;
