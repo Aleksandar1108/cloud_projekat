@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SmartGrid.Application.Common.Options;
+using SmartGrid.Application.Interfaces;
 using SmartGrid.Infrastructure.Common.Options;
 using SmartGrid.Infrastructure.Extensions;
+using SmartGrid.Infrastructure.Services;
 
 namespace SmartGrid.Infrastructure
 {
@@ -16,6 +18,7 @@ namespace SmartGrid.Infrastructure
             services.Configure<AzureBlobOptions>(configuration.GetSection("AzureBlobOptions"));
             services.Configure<AzureQueueOptions>(configuration.GetSection("AzureQueueOptions"));
             services.Configure<ParallelSettings>(configuration.GetSection("ParallelSettings"));
+            services.Configure<SQLServerOptions>(configuration.GetSection("SQLServer"));
 
             var tableConn = configuration.GetValue<string>("AzureTableOptions:ConnectionString")
                 ?? throw new InvalidOperationException("AzureTableOptions:ConnectionString is not configured.");
@@ -32,7 +35,13 @@ namespace SmartGrid.Infrastructure
                 .AddServices()
                 .AddAzureTables(tableConn)
                 .AddAzureBlobs(blobConn)
-                .AddAzureQueues(queueConn);
+                .AddAzureQueues(queueConn)
+                .AddSqlDatabase();
+
+               services.AddScoped<IJwtTokenService, JWTTokenService>();
+
+
+
 
             return services; 
         }
