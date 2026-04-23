@@ -38,7 +38,6 @@ namespace SmartGrid.Infrastructure.Extensions
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ITariffModelRepository, TariffModelRepository>();
-            services.AddScoped<IMonthlyBillRepository, MonthlyBillRepository>();
 
             return services;
         }

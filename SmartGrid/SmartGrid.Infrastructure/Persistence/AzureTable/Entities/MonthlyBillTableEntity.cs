@@ -1,12 +1,7 @@
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Entities
+namespace SmartGrid.Infrastructure.Persistence.AzureTable.Entities
 {
-    [Table("MonthlyBills")]
-    public class MonthlyBillEntity
+    internal class MonthlyBillTableEntity : BaseTableEntity
     {
-        public int Id { get; set; }
-        public string DeviceId { get; set; } = null!;
         public int Year { get; set; }
         public int Month { get; set; }
         public double TotalKwh { get; set; }
@@ -18,7 +13,7 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Entities
         public double EnergyCost { get; set; }
         public double FixedCosts { get; set; }
         public double TotalCost { get; set; }
-        public string BillText { get; set; } = null!;
+        public string BillText { get; set; } = string.Empty;
         public DateTime GeneratedAtUtc { get; set; }
     }
 }

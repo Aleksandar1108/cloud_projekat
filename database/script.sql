@@ -23,24 +23,8 @@ CREATE TABLE TariffModels (
   approvedPowerKw FLOAT NOT NULL
 );
 
-CREATE TABLE MonthlyBills (
-  id INT IDENTITY(1,1) PRIMARY KEY,
-  deviceId VARCHAR(128) NOT NULL,
-  year INT NOT NULL,
-  month INT NOT NULL,
-  totalKwh FLOAT NOT NULL,
-  higherTariffKwh FLOAT NOT NULL,
-  lowerTariffKwh FLOAT NOT NULL,
-  greenZoneKwh FLOAT NOT NULL,
-  blueZoneKwh FLOAT NOT NULL,
-  redZoneKwh FLOAT NOT NULL,
-  energyCost FLOAT NOT NULL,
-  fixedCosts FLOAT NOT NULL,
-  totalCost FLOAT NOT NULL,
-  billText NVARCHAR(MAX) NOT NULL,
-  generatedAtUtc DATETIME NOT NULL,
-  CONSTRAINT UQ_MonthlyBills_Device_Period UNIQUE (deviceId, year, month)
-);
+-- Monthly bill metadata is stored in Azure Table (Azurite: MonthlyBills table),
+-- while full bill content is stored in Azure Blob (monthly-bills container).
 
 -- Opcioni seed (pokrenuti kada telemetrija bude spremna i zelite obracun):
 -- INSERT INTO TariffModels (

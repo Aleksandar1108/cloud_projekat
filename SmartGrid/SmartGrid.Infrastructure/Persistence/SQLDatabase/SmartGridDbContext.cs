@@ -10,7 +10,6 @@ public class SmartGridDbContext : DbContext
 
     public DbSet<UserEntity> Users { get; set; } = null!;
     public DbSet<TariffModelEntity> TariffModels { get; set; } = null!;
-    public DbSet<MonthlyBillEntity> MonthlyBills { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -59,24 +58,5 @@ public class SmartGridDbContext : DbContext
             entity.Property(e => e.ApprovedPowerKw).IsRequired();
         });
 
-        modelBuilder.Entity<MonthlyBillEntity>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.DeviceId).IsRequired().HasMaxLength(128);
-            entity.Property(e => e.Year).IsRequired();
-            entity.Property(e => e.Month).IsRequired();
-            entity.Property(e => e.TotalKwh).IsRequired();
-            entity.Property(e => e.HigherTariffKwh).IsRequired();
-            entity.Property(e => e.LowerTariffKwh).IsRequired();
-            entity.Property(e => e.GreenZoneKwh).IsRequired();
-            entity.Property(e => e.BlueZoneKwh).IsRequired();
-            entity.Property(e => e.RedZoneKwh).IsRequired();
-            entity.Property(e => e.EnergyCost).IsRequired();
-            entity.Property(e => e.FixedCosts).IsRequired();
-            entity.Property(e => e.TotalCost).IsRequired();
-            entity.Property(e => e.BillText).IsRequired();
-            entity.Property(e => e.GeneratedAtUtc).IsRequired();
-            entity.HasIndex(e => new { e.DeviceId, e.Year, e.Month }).IsUnique();
-        });
     }
 }

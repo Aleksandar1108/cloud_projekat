@@ -18,7 +18,7 @@ namespace SmartGrid.Infrastructure.Persistence.AzureBlob.Storages
     {
         public override string GetBlobPath(MonthlyBillTextMetadata metadata)
         {
-            return $"{metadata.Year:D4}/{metadata.Month:D2}/device-{metadata.DeviceId}.txt";
+            return $"{metadata.Year:D4}/{metadata.Month:D2}/device-{metadata.DeviceId}.pdf";
         }
     }
 }
