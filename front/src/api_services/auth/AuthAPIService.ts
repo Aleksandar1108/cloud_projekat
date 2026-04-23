@@ -1,15 +1,14 @@
 import axios from "axios";
 import type { AuthResponse } from "../../types/auth/AuthResponse";
 import type { IAuthAPIService } from "./IAuthAPIService";
-
-const API_URL = import.meta.env.VITE_SERVER;
+import { buildApiUrl } from "../ApiBase";
 
 export const AuthAPIService: IAuthAPIService = {
 
     async login(email: string, password: string): Promise<AuthResponse> {
         try {
             const res = await axios.post<AuthResponse>(
-                `${API_URL}users/login`,
+                buildApiUrl("users/login"),
                 {
                     email,
                     password
@@ -37,7 +36,7 @@ export const AuthAPIService: IAuthAPIService = {
     async register(email: string, password: string): Promise<AuthResponse> {
         try {
             const res = await axios.post<AuthResponse>(
-                `${API_URL}users/register`,
+                buildApiUrl("users/register"),
                 { email, password }
             );
 

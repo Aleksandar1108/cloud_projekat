@@ -1,5 +1,5 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { AuthAPIService } from "../../api_services/auth/AuthAPIService";
 import RegisterForm from "../../components/auth/RegisterForm";
@@ -11,8 +11,7 @@ type RegisterFormData = {
 };
 
 function UsersPage() {
-    const navigate = useNavigate();
-    const { isAuthenticated, login } = useAuth();
+    const { isAuthenticated } = useAuth();
     const {
         register,
         handleSubmit,

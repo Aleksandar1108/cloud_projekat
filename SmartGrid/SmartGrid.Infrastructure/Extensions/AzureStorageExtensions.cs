@@ -52,6 +52,7 @@ namespace SmartGrid.Infrastructure.Extensions
             services.AddSingleton(sp => new BlobServiceClient(connectionString));
 
             services.AddScoped<IFirmwareBlobStorage, FirmwareBlobStorage>();
+            services.AddScoped<IMonthlyBillTextStorage, MonthlyBillTextStorage>();
 
             return services;
         }

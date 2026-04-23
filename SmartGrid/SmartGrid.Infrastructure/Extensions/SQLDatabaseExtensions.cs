@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Domain.Models;
 using SmartGrid.Infrastructure.Common.Options;
 using SmartGrid.Infrastructure.Persistence.SQLDatabase.Common;
@@ -36,6 +37,8 @@ namespace SmartGrid.Infrastructure.Extensions
             services.AddScoped<IDatabaseMapper<User, UserEntity>, UserMapper>();
 
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ITariffModelRepository, TariffModelRepository>();
+            services.AddScoped<IMonthlyBillRepository, MonthlyBillRepository>();
 
             return services;
         }
