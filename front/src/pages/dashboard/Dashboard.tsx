@@ -28,6 +28,21 @@ function DashboardPage(){
                     >
                         Otvori obracun
                     </button>
+                    <button
+                        onClick={() => navigate("/manual-readings")}
+                        style={{
+                            backgroundColor: "#0f766e",
+                            color: "var(--white)",
+                            border: "none",
+                            padding: "10px 16px",
+                            borderRadius: "6px",
+                            cursor: "pointer",
+                            fontWeight: "bold",
+                            marginLeft: "8px"
+                        }}
+                    >
+                        Rucni unos potrosnje
+                    </button>
                 </section>
             )}
         </main>

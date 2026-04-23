@@ -8,5 +8,6 @@
         public string DeviceStatusesTable { get; init; } = string.Empty;
         public string FirmwaresTable { get; init; } = string.Empty;
         public string MonthlyBillsTable { get; init; } = string.Empty;
+        public string ManualReadingsTable { get; init; } = string.Empty;
     }
 }

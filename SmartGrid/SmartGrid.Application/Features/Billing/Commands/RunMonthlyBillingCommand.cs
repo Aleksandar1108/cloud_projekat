@@ -31,6 +31,7 @@ namespace SmartGrid.Application.Features.Billing.Commands
 
     internal sealed class RunMonthlyBillingHandler(
         ITelemetryRepository telemetryRepository,
+        IManualReadingRepository manualReadingRepository,
         ITariffModelRepository tariffModelRepository,
         IMonthlyBillRepository monthlyBillRepository,
         IMonthlyBillTextStorage monthlyBillTextStorage,
@@ -52,8 +53,9 @@ namespace SmartGrid.Application.Features.Billing.Commands
             var periodEnd = periodStart.AddMonths(1);
 
             var telemetry = await telemetryRepository.GetByPeriodAsync(periodStart, periodEnd, ct);
+            var processedManualReadings = await manualReadingRepository.GetProcessedByPeriodAsync(periodStart, periodEnd, ct);
 
-            if (telemetry.Count == 0)
+            if (telemetry.Count == 0 && processedManualReadings.Count == 0)
             {
                 return Result<IReadOnlyCollection<MonthlyBillDto>>.Success(Array.Empty<MonthlyBillDto>());
             }
@@ -67,14 +69,17 @@ namespace SmartGrid.Application.Features.Billing.Commands
             }
 
             var bills = new List<MonthlyBillDto>();
-            var groups = telemetry.GroupBy(t => t.DeviceId.Value);
+            var deviceIds = telemetry.Select(t => t.DeviceId.Value)
+                .Concat(processedManualReadings.Select(m => m.DeviceId))
+                .Distinct()
+                .ToList();
 
-            foreach (var group in groups)
+            foreach (var deviceId in deviceIds)
             {
                 var higherKwh = 0.0;
                 var lowerKwh = 0.0;
 
-                foreach (var sample in group)
+                foreach (var sample in telemetry.Where(t => t.DeviceId.Value == deviceId))
                 {
                     var sampleKwh = sample.CurrentPower.Value * SampleIntervalHours;
                     if (sample.Timestamp.Hour >= 7 && sample.Timestamp.Hour < 23)
@@ -87,7 +92,20 @@ namespace SmartGrid.Application.Features.Billing.Commands
                     }
                 }
 
-                var bill = BuildBill(group.Key, request.Year, request.Month, higherKwh, lowerKwh, tariffModel);
+                var processedForDevice = processedManualReadings.Where(x => x.DeviceId == deviceId);
+                foreach (var manual in processedForDevice)
+                {
+                    if (manual.ReadingAtUtc.Hour >= 7 && manual.ReadingAtUtc.Hour < 23)
+                    {
+                        higherKwh += manual.ReadingKwh;
+                    }
+                    else
+                    {
+                        lowerKwh += manual.ReadingKwh;
+                    }
+                }
+
+                var bill = BuildBill(deviceId, request.Year, request.Month, higherKwh, lowerKwh, tariffModel);
 
                 await monthlyBillTextStorage.SaveAsync(new FileData<MonthlyBillTextMetadata>
                 {
@@ -96,7 +114,7 @@ namespace SmartGrid.Application.Features.Billing.Commands
                     {
                         Year = request.Year,
                         Month = request.Month,
-                        DeviceId = group.Key
+                        DeviceId = deviceId
                     }
                 }, ct);
 

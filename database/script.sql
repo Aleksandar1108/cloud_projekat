@@ -23,6 +23,9 @@ CREATE TABLE TariffModels (
   approvedPowerKw FLOAT NOT NULL
 );
 
+-- ManualReadings are stored in Azure Table (Azurite: ManualReadings table),
+-- while raw/optimized images are stored in Azure Blob (manual-readings container).
+
 -- Monthly bill metadata is stored in Azure Table (Azurite: MonthlyBills table),
 -- while full bill content is stored in Azure Blob (monthly-bills container).
 
