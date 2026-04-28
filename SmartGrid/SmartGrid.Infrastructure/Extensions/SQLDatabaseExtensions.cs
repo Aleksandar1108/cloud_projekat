@@ -35,7 +35,8 @@ namespace SmartGrid.Infrastructure.Extensions
                 options.UseSqlServer(connectionString);
             });
             services.AddScoped<IDatabaseMapper<User, UserEntity>, UserMapper>();
-
+            services.AddScoped<IDatabaseMapper<EmailActivation, EmailActivationEntity>, EmailActivationMapper>();
+            services.AddScoped<IEmailActivationRepository, EmailActivationRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ITariffModelRepository, TariffModelRepository>();
 

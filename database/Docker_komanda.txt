@@ -1,0 +1,2 @@
+docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Str0ng!Pass123" -p 1433:1433 --name microsoft_sql_local -d mcr.microsoft.com/mssql/server:2022-latest
+
