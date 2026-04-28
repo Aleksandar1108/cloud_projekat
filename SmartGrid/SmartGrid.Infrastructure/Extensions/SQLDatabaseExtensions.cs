@@ -38,6 +38,7 @@ namespace SmartGrid.Infrastructure.Extensions
             services.AddScoped<IDatabaseMapper<EmailActivation, EmailActivationEntity>, EmailActivationMapper>();
             services.AddScoped<IEmailActivationRepository, EmailActivationRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ITariffModelRepository, TariffModelRepository>();
 
             return services;
         }
