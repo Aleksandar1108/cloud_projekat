@@ -39,7 +39,7 @@ namespace SmartGrid.Infrastructure
                 .AddSqlDatabase();
 
                services.AddScoped<IJwtTokenService, JWTTokenService>();
-
+               services.AddScoped<IEmailService, EmailService>();
 
 
 

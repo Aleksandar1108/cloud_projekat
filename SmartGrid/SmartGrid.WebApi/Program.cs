@@ -2,6 +2,8 @@ using Microsoft.OpenApi;
 using SmartGrid.WebApi.Extensions;
 using SmartGrid.WebApi.Hubs;
 
+dotenv.net.DotEnv.Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
 var webApiConfig = builder.Configuration.GetSection("WebApi");
