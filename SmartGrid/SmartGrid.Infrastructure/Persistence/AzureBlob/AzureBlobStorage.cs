@@ -47,6 +47,13 @@ namespace SmartGrid.Infrastructure.Persistence.AzureBlob
 
             await blobClient.UploadAsync(stream, blobOptions, ct);
         }
+        public async Task<byte[]> ReadAsync(TMetadata metadata, CancellationToken ct = default)
+        {
+            var blobPath = GetBlobPath(metadata);
+            var blobClient = _containerClient.GetBlobClient(blobPath);
+            var response = await blobClient.DownloadContentAsync(ct);
+            return response.Value.Content.ToArray();
+        }
         public async Task<bool> ExistsAsync(TMetadata metadata, CancellationToken ct = default)
         {
             var blobPath = GetBlobPath(metadata);

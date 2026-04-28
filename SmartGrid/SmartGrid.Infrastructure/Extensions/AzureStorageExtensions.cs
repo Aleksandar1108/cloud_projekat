@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using SmartGrid.Application.Interfaces.Messaging;
 using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Application.Interfaces.Storage;
+using SmartGrid.Application.Features.Billing.Commands;
+using SmartGrid.Application.Features.ManualReadings;
 using SmartGrid.Domain.Models;
 using SmartGrid.Infrastructure.Persistence.AzureBlob.Storages;
 using SmartGrid.Infrastructure.Persistence.AzureQueue.Services;
@@ -30,18 +32,24 @@ namespace SmartGrid.Infrastructure.Extensions
             services.AddSingleton<ITableMapper<Device, DeviceEntity>, DeviceTableMapper>();
             services.AddSingleton<ITableMapper<DeviceStatus, DeviceStatusEntity>, DeviceStatusTableMapper>();
             services.AddSingleton<ITableMapper<Firmware, FirmwareEntity>, FirmwareTableMapper>();
+            services.AddSingleton<ITableMapper<MonthlyBillDto, MonthlyBillTableEntity>, MonthlyBillTableMapper>();
+            services.AddSingleton<ITableMapper<ManualReadingDto, ManualReadingTableEntity>, ManualReadingTableMapper>();
 
             // Key Providers
             services.AddSingleton<ITableKeyProvider<Telemetry>, TelemetryTableKeyProvider>();
             services.AddSingleton<ITableKeyProvider<Device>, DeviceTableKeyProvider>();
             services.AddSingleton<ITableKeyProvider<DeviceStatus>, DeviceStatusTableKeyProvider>();
             services.AddSingleton<ITableKeyProvider<Firmware>, FirmwareTableKeyProvider>();
+            services.AddSingleton<ITableKeyProvider<MonthlyBillDto>, MonthlyBillTableKeyProvider>();
+            services.AddSingleton<ITableKeyProvider<ManualReadingDto>, ManualReadingTableKeyProvider>();
 
             // Repositories
             services.AddScoped<ITelemetryRepository, TelemetryRepository>();
             services.AddScoped<IDeviceRepository, DeviceRepository>();
             services.AddScoped<IFirmwareRepository, FirmwareRepository>();
             services.AddScoped<IDeviceStatusQueryRepository, DeviceStatusQueryRepository>();
+            services.AddScoped<IMonthlyBillRepository, MonthlyBillRepository>();
+            services.AddScoped<IManualReadingRepository, ManualReadingRepository>();
 
             return services;
         }
@@ -52,6 +60,8 @@ namespace SmartGrid.Infrastructure.Extensions
             services.AddSingleton(sp => new BlobServiceClient(connectionString));
 
             services.AddScoped<IFirmwareBlobStorage, FirmwareBlobStorage>();
+            services.AddScoped<IMonthlyBillTextStorage, MonthlyBillTextStorage>();
+            services.AddScoped<IManualReadingImageStorage, ManualReadingImageStorage>();
 
             return services;
         }
@@ -61,7 +71,7 @@ namespace SmartGrid.Infrastructure.Extensions
         {
             services.AddSingleton(sp =>
             {
-                return new QueueServiceClient(connectionString, new QueueClientOptions
+                return new QueueServiceClient(connectionString, new QueueClientOptions(QueueClientOptions.ServiceVersion.V2025_11_05)
                 {
                     MessageEncoding = QueueMessageEncoding.Base64
                 });

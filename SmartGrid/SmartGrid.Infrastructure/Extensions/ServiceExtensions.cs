@@ -13,6 +13,8 @@ namespace SmartGrid.Infrastructure.Extensions
             services.AddScoped<IParallelSettingsProvider, ParallelSettingsProvider>();
 
             services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
+            services.AddScoped<IEmailService, SmtpEmailService>();
+            services.AddScoped<IImageOptimizationService, ImageOptimizationService>();
 
             return services;
         }
