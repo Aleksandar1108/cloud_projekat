@@ -1,7 +1,7 @@
-using SmartGrid.Application.Interfaces;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing;
+using SmartGrid.Application.Interfaces;
 
 namespace SmartGrid.Infrastructure.Services
 {

@@ -1,6 +1,5 @@
 using MediatR;
 using SmartGrid.Application.Common;
-using SmartGrid.Application.Features.ManualReadings;
 using SmartGrid.Application.Interfaces;
 using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Application.Interfaces.Storage;

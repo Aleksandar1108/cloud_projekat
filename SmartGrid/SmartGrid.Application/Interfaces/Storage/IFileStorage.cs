@@ -8,5 +8,5 @@ namespace SmartGrid.Application.Interfaces.Storage
         Task<byte[]> ReadAsync(TMetadata metadata, CancellationToken ct = default);
         Task<bool> ExistsAsync(TMetadata metadata, CancellationToken ct = default);
         Task DeleteAsync(TMetadata metadata, CancellationToken ct = default);
-    } 
+    }
 }

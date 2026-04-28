@@ -2,11 +2,11 @@
 using Azure.Storage.Blobs;
 using Azure.Storage.Queues;
 using Microsoft.Extensions.DependencyInjection;
+using SmartGrid.Application.Features.Billing.Commands;
+using SmartGrid.Application.Features.ManualReadings;
 using SmartGrid.Application.Interfaces.Messaging;
 using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Application.Interfaces.Storage;
-using SmartGrid.Application.Features.Billing.Commands;
-using SmartGrid.Application.Features.ManualReadings;
 using SmartGrid.Domain.Models;
 using SmartGrid.Infrastructure.Persistence.AzureBlob.Storages;
 using SmartGrid.Infrastructure.Persistence.AzureQueue.Services;

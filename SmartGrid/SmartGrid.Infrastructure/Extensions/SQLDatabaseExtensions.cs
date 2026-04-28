@@ -8,11 +8,6 @@ using SmartGrid.Infrastructure.Persistence.SQLDatabase.Common;
 using SmartGrid.Infrastructure.Persistence.SQLDatabase.Entities;
 using SmartGrid.Infrastructure.Persistence.SQLDatabase.Mappers;
 using SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SmartGrid.Infrastructure.Extensions
 {

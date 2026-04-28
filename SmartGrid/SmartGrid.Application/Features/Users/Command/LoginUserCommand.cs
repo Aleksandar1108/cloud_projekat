@@ -3,13 +3,7 @@ using Microsoft.Extensions.Logging;
 using SmartGrid.Application.Interfaces;
 using SmartGrid.Domain.Common;
 using SmartGrid.Domain.Enums;
-using SmartGrid.Domain.Models;
 using SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SmartGrid.Application.Features.Users.Command
 {

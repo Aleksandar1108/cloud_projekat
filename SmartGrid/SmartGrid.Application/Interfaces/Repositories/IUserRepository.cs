@@ -1,10 +1,5 @@
 ﻿using SmartGrid.Domain.Models;
 using SmartGrid.Domain.ValueObjects.User;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories
 {

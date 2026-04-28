@@ -1,8 +1,8 @@
 using Azure;
 using Azure.Data.Tables;
+using Microsoft.Extensions.Options;
 using SmartGrid.Application.Features.Billing.Commands;
 using SmartGrid.Application.Interfaces.Repositories;
-using Microsoft.Extensions.Options;
 using SmartGrid.Infrastructure.Common.Options;
 using SmartGrid.Infrastructure.Persistence.AzureTable.Common;
 using SmartGrid.Infrastructure.Persistence.AzureTable.Entities;

@@ -165,11 +165,14 @@ namespace SmartGrid.Application.Features.Billing.Commands
                     .AppendLine("Detalji racuna su dostupni u SmartGrid aplikaciji.")
                     .ToString();
 
-                await emailService.SendAsync(
-                    recipients,
-                    $"SmartGrid - Mesecni obracun {year:D4}-{month:D2}",
-                    body,
-                    ct);
+                foreach (var recipient in recipients)
+                {
+                    await emailService.SendEmailAsync(
+                        recipient,
+                        $"SmartGrid - Mesecni obracun {year:D4}-{month:D2}",
+                        body);
+                }
+
             }
             catch (Exception ex)
             {

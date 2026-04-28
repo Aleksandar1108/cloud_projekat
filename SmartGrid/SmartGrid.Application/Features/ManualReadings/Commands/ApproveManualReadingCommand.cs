@@ -1,7 +1,7 @@
 using MediatR;
+using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Domain.Common;
 using SmartGrid.Domain.Enums;
-using SmartGrid.Application.Interfaces.Repositories;
 
 namespace SmartGrid.Application.Features.ManualReadings.Commands
 {

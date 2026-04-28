@@ -1,6 +1,5 @@
 ﻿using SmartGrid.Domain.Common;
 using SmartGrid.Domain.Enums;
-using System;
 using System.Text.RegularExpressions;
 
 namespace SmartGrid.Domain.ValueObjects.User
@@ -28,7 +27,7 @@ namespace SmartGrid.Domain.ValueObjects.User
 
             return Result<Email>.Success(new Email(trimmed));
         }
-        
+
         public override string ToString() => Value;
 
         public static implicit operator string(Email email) => email.Value;

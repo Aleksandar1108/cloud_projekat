@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using BCrypt.Net;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SmartGrid.Domain.ValueObjects.User
+﻿namespace SmartGrid.Domain.ValueObjects.User
 {
     public class PasswordHash
     {

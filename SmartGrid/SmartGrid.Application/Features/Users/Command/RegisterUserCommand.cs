@@ -5,13 +5,7 @@ using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Domain.Common;
 using SmartGrid.Domain.Enums;
 using SmartGrid.Domain.Models;
-using SmartGrid.Domain.ValueObjects.User;
 using SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SmartGrid.Application.Features.Users.Command
 {
@@ -55,7 +49,7 @@ namespace SmartGrid.Application.Features.Users.Command
             catch (Exception ex)
             {
                 logger.LogError(ex, "Registration failed");
-                return Result<AuthResponse>.Failure("Registration failed",ErrorType.Failure);
+                return Result<AuthResponse>.Failure("Registration failed", ErrorType.Failure);
             }
         }
     }

@@ -11,7 +11,7 @@ namespace SmartGrid.Infrastructure
     public static class DependencyInjection
     {
         public static IServiceCollection AddInfrastructure(
-            this IServiceCollection services, 
+            this IServiceCollection services,
             IConfiguration configuration)
         {
             services.Configure<AzureTableOptions>(configuration.GetSection("AzureTableOptions"));
@@ -39,12 +39,12 @@ namespace SmartGrid.Infrastructure
                 .AddAzureQueues(queueConn)
                 .AddSqlDatabase();
 
-               services.AddScoped<IJwtTokenService, JWTTokenService>();
-               services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IJwtTokenService, JWTTokenService>();
+            services.AddScoped<IEmailService, EmailService>();
 
 
 
-            return services; 
+            return services;
         }
     }
 }

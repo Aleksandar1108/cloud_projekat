@@ -1,5 +1,5 @@
-﻿using Azure.Data.Tables;
-using Azure;
+﻿using Azure;
+using Azure.Data.Tables;
 using Microsoft.Extensions.Options;
 using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Domain.Models;
@@ -23,7 +23,7 @@ namespace SmartGrid.Infrastructure.Persistence.AzureTable.Repositories
     {
         public async Task SaveAsync(Telemetry telemetry, CancellationToken ct)
         {
-           await base.AddAsync(telemetry, ct);
+            await base.AddAsync(telemetry, ct);
         }
 
         public async Task<IReadOnlyCollection<Telemetry>> GetByPeriodAsync(DateTime periodStartUtc, DateTime periodEndUtc, CancellationToken ct = default)

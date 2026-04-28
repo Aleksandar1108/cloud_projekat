@@ -1,5 +1,4 @@
 using MediatR;
-using SmartGrid.Application.Features.ManualReadings;
 using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Domain.Common;
 using SmartGrid.Domain.Enums;

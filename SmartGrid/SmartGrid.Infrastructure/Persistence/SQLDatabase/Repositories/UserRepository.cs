@@ -1,11 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartGrid.Domain.Models;
 using SmartGrid.Domain.ValueObjects.User;
-using SmartGrid.Infrastructure.Persistence.AzureTable.Common;
-using SmartGrid.Infrastructure.Persistence.AzureTable.Entities;
 using SmartGrid.Infrastructure.Persistence.SQLDatabase.Common;
 using SmartGrid.Infrastructure.Persistence.SQLDatabase.Entities;
-using SmartGrid.Infrastructure.Persistence.SQLDatabase.Mappers;
 
 namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories
 {

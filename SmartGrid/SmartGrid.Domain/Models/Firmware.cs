@@ -12,7 +12,7 @@ namespace SmartGrid.Domain.Models
 
         public FirmwareFileName FileName { get; private set; }
         public long FileSizeInBytes { get; private set; }
-       
+
         public DateTime UploadedAt { get; private set; }
 
         private Firmware(
@@ -34,9 +34,9 @@ namespace SmartGrid.Domain.Models
         #region Factory Method
 
         public static Result<Firmware> Create(
-            DeviceType deviceType, 
-            string version, 
-            string fileName, 
+            DeviceType deviceType,
+            string version,
+            string fileName,
             long fileSize,
             DateTime uploadedAt
         )

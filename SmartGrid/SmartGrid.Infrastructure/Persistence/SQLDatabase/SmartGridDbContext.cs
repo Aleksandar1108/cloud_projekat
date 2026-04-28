@@ -44,7 +44,7 @@ public class SmartGridDbContext : DbContext
                   .HasColumnName("idEmailActivation");
 
             entity.Property(e => e.UserId)
-                  .HasColumnName("idUsers");   
+                  .HasColumnName("idUsers");
 
             entity.Property(e => e.ActivationToken)
                   .HasColumnName("activationToken");
@@ -53,7 +53,7 @@ public class SmartGridDbContext : DbContext
                   .HasColumnName("createdAt");
 
             entity.Property(e => e.ExpirationDate)
-                  .HasColumnName("expireAt");  
+                  .HasColumnName("expireAt");
 
             entity.HasOne<UserEntity>()
                   .WithMany()

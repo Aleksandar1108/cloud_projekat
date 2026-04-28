@@ -1,17 +1,11 @@
 ﻿using SmartGrid.Domain.Models;
-using SmartGrid.Domain.ValueObjects;
 using SmartGrid.Domain.ValueObjects.User;
 using SmartGrid.Infrastructure.Persistence.SQLDatabase.Common;
 using SmartGrid.Infrastructure.Persistence.SQLDatabase.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Mappers
 {
-    public class UserMapper : IDatabaseMapper<User,UserEntity>
+    public class UserMapper : IDatabaseMapper<User, UserEntity>
     {
         public User? ToDomain(UserEntity entity)
         {

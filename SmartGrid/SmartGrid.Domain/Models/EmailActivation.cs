@@ -1,13 +1,8 @@
 ﻿using SmartGrid.Domain.ValueObjects.User;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SmartGrid.Domain.Models
 {
-    public class EmailActivation 
+    public class EmailActivation
     {
         public EmailActivationId Id { get; }
         public UserId UserId { get; }

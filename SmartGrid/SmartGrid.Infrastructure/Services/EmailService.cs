@@ -2,14 +2,7 @@
 using Mailjet.Client.Resources;
 using Newtonsoft.Json.Linq;
 using SmartGrid.Application.Interfaces;
-using SmartGrid.Domain.ValueObjects.User;
 using SmartGrid.Infrastructure.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SmartGrid.Infrastructure.Services
 {
