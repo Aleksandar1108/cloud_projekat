@@ -3,6 +3,7 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Queues;
 using Microsoft.Extensions.DependencyInjection;
 using SmartGrid.Application.Features.Billing.Commands;
+using SmartGrid.Application.Features.Payments;
 using SmartGrid.Application.Features.ManualReadings;
 using SmartGrid.Application.Interfaces.Messaging;
 using SmartGrid.Application.Interfaces.Repositories;
@@ -34,6 +35,7 @@ namespace SmartGrid.Infrastructure.Extensions
             services.AddSingleton<ITableMapper<Firmware, FirmwareEntity>, FirmwareTableMapper>();
             services.AddSingleton<ITableMapper<MonthlyBillDto, MonthlyBillTableEntity>, MonthlyBillTableMapper>();
             services.AddSingleton<ITableMapper<ManualReadingDto, ManualReadingTableEntity>, ManualReadingTableMapper>();
+            services.AddSingleton<ITableMapper<PaymentDto, PaymentTableEntity>, PaymentTableMapper>();
 
             // Key Providers
             services.AddSingleton<ITableKeyProvider<Telemetry>, TelemetryTableKeyProvider>();
@@ -42,6 +44,7 @@ namespace SmartGrid.Infrastructure.Extensions
             services.AddSingleton<ITableKeyProvider<Firmware>, FirmwareTableKeyProvider>();
             services.AddSingleton<ITableKeyProvider<MonthlyBillDto>, MonthlyBillTableKeyProvider>();
             services.AddSingleton<ITableKeyProvider<ManualReadingDto>, ManualReadingTableKeyProvider>();
+            services.AddSingleton<ITableKeyProvider<PaymentDto>, PaymentTableKeyProvider>();
 
             // Repositories
             services.AddScoped<ITelemetryRepository, TelemetryRepository>();
@@ -50,6 +53,8 @@ namespace SmartGrid.Infrastructure.Extensions
             services.AddScoped<IDeviceStatusQueryRepository, DeviceStatusQueryRepository>();
             services.AddScoped<IMonthlyBillRepository, MonthlyBillRepository>();
             services.AddScoped<IManualReadingRepository, ManualReadingRepository>();
+            services.AddScoped<IPaymentRepository, PaymentRepository>();
+            services.AddScoped<IStripeEventRepository, StripeEventRepository>();
 
             return services;
         }

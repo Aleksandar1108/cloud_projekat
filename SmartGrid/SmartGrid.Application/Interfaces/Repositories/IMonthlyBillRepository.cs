@@ -6,5 +6,6 @@ namespace SmartGrid.Application.Interfaces.Repositories
     {
         Task SaveOrUpdateAsync(MonthlyBillDto bill, CancellationToken ct = default);
         Task<IReadOnlyCollection<MonthlyBillDto>> GetByPeriodAsync(int year, int month, CancellationToken ct = default);
+        Task<MonthlyBillDto?> GetAsync(int year, int month, string deviceId, CancellationToken ct = default);
     }
 }

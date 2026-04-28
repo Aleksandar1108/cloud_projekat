@@ -20,6 +20,7 @@ namespace SmartGrid.Infrastructure
             services.Configure<ParallelSettings>(configuration.GetSection("ParallelSettings"));
             services.Configure<SQLServerOptions>(configuration.GetSection("SQLServer"));
             services.Configure<SmtpOptions>(configuration.GetSection("Smtp"));
+            services.Configure<StripeOptions>(configuration.GetSection("Stripe"));
 
             var tableConn = configuration.GetValue<string>("AzureTableOptions:ConnectionString")
                 ?? throw new InvalidOperationException("AzureTableOptions:ConnectionString is not configured.");
@@ -41,8 +42,6 @@ namespace SmartGrid.Infrastructure
 
             services.AddScoped<IJwtTokenService, JWTTokenService>();
             services.AddScoped<IEmailService, EmailService>();
-
-
 
             return services;
         }

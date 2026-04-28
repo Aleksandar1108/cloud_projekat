@@ -41,5 +41,12 @@ namespace SmartGrid.Infrastructure.Persistence.AzureTable.Repositories
 
             return bills.OrderBy(x => x.DeviceId).ToList();
         }
+
+        public async Task<MonthlyBillDto?> GetAsync(int year, int month, string deviceId, CancellationToken ct = default)
+        {
+            var partitionKey = $"{year:D4}-{month:D2}";
+            var rowKey = Uri.EscapeDataString(deviceId);
+            return await base.GetByIdAsync(partitionKey, rowKey, ct);
+        }
     }
 }

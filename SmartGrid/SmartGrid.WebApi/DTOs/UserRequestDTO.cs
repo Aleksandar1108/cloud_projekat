@@ -1,10 +1,8 @@
-﻿using MediatR;
-using SmartGrid.Domain.Common;
-
-namespace SmartGrid.WebApi.DTOs
+﻿namespace SmartGrid.WebApi.DTOs
 {
-    public record UserRequestDTO(
-        string Email,
-        string Password
-    ) : IRequest<Result<string>>;
+    public class UserRequestDTO
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
 }

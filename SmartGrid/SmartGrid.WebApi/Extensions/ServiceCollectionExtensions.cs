@@ -3,6 +3,7 @@ using Microsoft.OpenApi;
 using SmartGrid.Application;
 using SmartGrid.Infrastructure;
 using SmartGrid.WebApi.BackgroundServices;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace SmartGrid.WebApi.Extensions
@@ -19,6 +20,8 @@ namespace SmartGrid.WebApi.Extensions
             services.AddControllers()
                 .AddJsonOptions(options =>
                 {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
 

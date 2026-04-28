@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SmartGrid.Application.Interfaces;
 using SmartGrid.Application.Interfaces.Repositories;
@@ -19,6 +20,7 @@ namespace SmartGrid.Application.Features.Users.Command
     IJwtTokenService jwtService,
     IEmailActivationRepository emailActivationRepository,
     IEmailService emailService,
+    IHostEnvironment environment,
     ILogger<RegisterUserHandler> logger)
     : IRequestHandler<RegisterUserCommand, Result<AuthResponse>>
     {
@@ -49,7 +51,10 @@ namespace SmartGrid.Application.Features.Users.Command
             catch (Exception ex)
             {
                 logger.LogError(ex, "Registration failed");
-                return Result<AuthResponse>.Failure("Registration failed", ErrorType.Failure);
+                var message = environment.IsDevelopment()
+                    ? $"Registration failed: {ex.Message}"
+                    : "Registration failed";
+                return Result<AuthResponse>.Failure(message, ErrorType.Failure);
             }
         }
     }

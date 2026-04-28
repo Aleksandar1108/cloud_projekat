@@ -17,6 +17,9 @@
     <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.14.0" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.14.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+    <PackageReference Include="Stripe.net">
+      <Version>51.1.0</Version>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
