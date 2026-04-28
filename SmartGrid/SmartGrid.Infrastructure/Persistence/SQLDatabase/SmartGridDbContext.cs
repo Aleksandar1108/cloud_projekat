@@ -39,21 +39,25 @@ public class SmartGridDbContext : DbContext
         {
             entity.HasKey(e => e.IdEmailActivation);
 
-            entity.Property(e => e.ActivationToken)
-                  .IsRequired();
-
-            entity.Property(e => e.CreatedAt)
-                  .IsRequired();
-
-            entity.Property(e => e.ExpirationDate)
-                  .IsRequired();
+            entity.Property(e => e.IdEmailActivation)
+                  .HasColumnName("idEmailActivation");
 
             entity.Property(e => e.UserId)
-                  .IsRequired();
+                  .HasColumnName("idUsers");   
+
+            entity.Property(e => e.ActivationToken)
+                  .HasColumnName("activationToken");
+
+            entity.Property(e => e.CreatedAt)
+                  .HasColumnName("createdAt");
+
+            entity.Property(e => e.ExpirationDate)
+                  .HasColumnName("expireAt");  
 
             entity.HasOne<UserEntity>()
                   .WithMany()
-                  .HasForeignKey(e => e.UserId);
+                  .HasForeignKey(e => e.UserId)
+                  .HasPrincipalKey(u => u.IdUsers);
         });
     }
 }

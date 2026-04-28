@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Domain.Models;
 using SmartGrid.Infrastructure.Common.Options;
 using SmartGrid.Infrastructure.Persistence.SQLDatabase.Common;
@@ -34,7 +35,8 @@ namespace SmartGrid.Infrastructure.Extensions
                 options.UseSqlServer(connectionString);
             });
             services.AddScoped<IDatabaseMapper<User, UserEntity>, UserMapper>();
-
+            services.AddScoped<IDatabaseMapper<EmailActivation, EmailActivationEntity>, EmailActivationMapper>();
+            services.AddScoped<IEmailActivationRepository, EmailActivationRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
 
             return services;

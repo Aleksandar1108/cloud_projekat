@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using SmartGrid.Application.Interfaces;
+using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Domain.Common;
 using SmartGrid.Domain.Enums;
 using SmartGrid.Domain.Models;
@@ -22,6 +23,7 @@ namespace SmartGrid.Application.Features.Users.Command
     internal class RegisterUserHandler(
     IUserRepository userRepository,
     IJwtTokenService jwtService,
+    IEmailActivationRepository emailActivationRepository,
     ILogger<RegisterUserHandler> logger)
     : IRequestHandler<RegisterUserCommand, Result<AuthResponse>>
     {
@@ -36,6 +38,11 @@ namespace SmartGrid.Application.Features.Users.Command
                 var user = User.Create(request.Email, request.Password);
 
                 await userRepository.AddAsync(user);
+
+
+                var activation = EmailActivation.Create(user.Id);
+
+                await emailActivationRepository.AddAsync(activation);
 
                 var token = jwtService.GenerateToken(user);
 

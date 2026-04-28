@@ -16,7 +16,7 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Mappers
         public User? ToDomain(UserEntity entity)
         {
             return new User(
-                UserId.FromGuid(Guid.Parse(entity.IdUsers)),
+                UserId.FromGuid(entity.IdUsers),
                 Email.Create(entity.Email).Value,
                 Enum.Parse<Domain.Enums.UserRole>(entity.Role),
                 new PasswordHash(entity.Password),
@@ -29,7 +29,7 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Mappers
         {
             return new UserEntity
             {
-                IdUsers = domain.Id.Value.ToString(),
+                IdUsers = domain.Id,
                 Email = domain.Email.Value,
                 Password = domain.Password.Value,
                 Role = domain.Role.ToString(),
