@@ -9,6 +9,7 @@ public class SmartGridDbContext : DbContext
     }
 
     public DbSet<UserEntity> Users { get; set; } = null!;
+    public DbSet<EmailActivationEntity> EmailActivations { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -30,6 +31,29 @@ public class SmartGridDbContext : DbContext
 
             entity.Property(e => e.AccountCreated)
                   .IsRequired();
+            entity.Property(e => e.IsActive)
+                  .IsRequired()
+                  .HasColumnName("isActivated");
+        });
+        modelBuilder.Entity<EmailActivationEntity>(entity =>
+        {
+            entity.HasKey(e => e.IdEmailActivation);
+
+            entity.Property(e => e.ActivationToken)
+                  .IsRequired();
+
+            entity.Property(e => e.CreatedAt)
+                  .IsRequired();
+
+            entity.Property(e => e.ExpirationDate)
+                  .IsRequired();
+
+            entity.Property(e => e.UserId)
+                  .IsRequired();
+
+            entity.HasOne<UserEntity>()
+                  .WithMany()
+                  .HasForeignKey(e => e.UserId);
         });
     }
 }

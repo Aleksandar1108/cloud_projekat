@@ -16,5 +16,7 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Entities
         public string Role { get; set; } = null!;
 
         public DateTime AccountCreated { get; set; }
+
+        public bool IsActive { get; set; }
     }
 }
