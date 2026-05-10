@@ -14,6 +14,7 @@ namespace SmartGrid.Infrastructure.Extensions
 
             services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
             services.AddScoped<IImageOptimizationService, ImageOptimizationService>();
+            services.AddScoped<IPaymentCheckoutService, StripeCheckoutService>();
 
             return services;
         }

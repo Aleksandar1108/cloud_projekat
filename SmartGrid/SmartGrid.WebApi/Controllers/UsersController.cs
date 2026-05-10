@@ -11,9 +11,13 @@ namespace SmartGrid.WebApi.Controllers;
 public class UsersController(IMediator mediator) : ControllerBase
 {
     [HttpPost("register")]
-    public async Task<IActionResult> Register(
-        [FromBody] UserRequestDTO request)
+    public async Task<IActionResult> Register([FromBody] UserRequestDTO request)
     {
+        if (request is null)
+        {
+            return BadRequest(new { message = "Invalid or empty JSON payload." });
+        }
+
         var command = new RegisterUserCommand(
             request.Email,
             request.Password
@@ -25,9 +29,13 @@ public class UsersController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login(
-    [FromBody] UserRequestDTO request)
+    public async Task<IActionResult> Login([FromBody] UserRequestDTO request)
     {
+        if (request is null)
+        {
+            return BadRequest(new { message = "Invalid or empty JSON payload." });
+        }
+
         var command = new LoginUserCommand(
             request.Email,
             request.Password

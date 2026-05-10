@@ -9,5 +9,7 @@
         public string FirmwaresTable { get; init; } = string.Empty;
         public string MonthlyBillsTable { get; init; } = string.Empty;
         public string ManualReadingsTable { get; init; } = string.Empty;
+        public string PaymentsTable { get; init; } = string.Empty;
+        public string StripeEventsTable { get; init; } = string.Empty;
     }
 }

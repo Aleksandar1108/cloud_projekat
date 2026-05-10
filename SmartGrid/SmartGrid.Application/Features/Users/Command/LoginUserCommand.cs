@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SmartGrid.Application.Interfaces;
 using SmartGrid.Domain.Common;
@@ -14,6 +15,7 @@ namespace SmartGrid.Application.Features.Users.Command
     internal class LoginUserHandler(
     IUserRepository userRepository,
     IJwtTokenService jwtService,
+    IHostEnvironment environment,
     ILogger<LoginUserHandler> logger)
     : IRequestHandler<LoginUserCommand, Result<AuthResponse>>
     {
@@ -35,7 +37,10 @@ namespace SmartGrid.Application.Features.Users.Command
             catch (Exception ex)
             {
                 logger.LogError(ex, "Login failed");
-                return Result<AuthResponse>.Failure("Login failed", ErrorType.Failure);
+                var message = environment.IsDevelopment()
+                    ? $"Login failed: {ex.Message}"
+                    : "Login failed";
+                return Result<AuthResponse>.Failure(message, ErrorType.Failure);
             }
         }
     }

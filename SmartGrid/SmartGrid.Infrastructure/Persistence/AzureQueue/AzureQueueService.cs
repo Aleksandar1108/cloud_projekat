@@ -14,11 +14,18 @@ namespace SmartGrid.Infrastructure.Persistence.AzureQueue
         protected readonly QueueClient _queueClient = queueClient;
         protected readonly IJsonSerializer _serializer = serializer;
         protected readonly ILogger _logger = logger;
+        private bool _queueEnsured;
 
         public async Task<IReceivedMessage<T>?> ReceiveMessageAsync(CancellationToken ct = default)
         {
             try
             {
+                if (!_queueEnsured)
+                {
+                    await _queueClient.CreateIfNotExistsAsync(cancellationToken: ct);
+                    _queueEnsured = true;
+                }
+
                 var response = await _queueClient.ReceiveMessagesAsync(maxMessages: 1,
                                                                        visibilityTimeout: TimeSpan.FromSeconds(30),
                                                                        cancellationToken: ct);
@@ -51,6 +58,12 @@ namespace SmartGrid.Infrastructure.Persistence.AzureQueue
 
             try
             {
+                if (!_queueEnsured)
+                {
+                    await _queueClient.CreateIfNotExistsAsync(cancellationToken: ct);
+                    _queueEnsured = true;
+                }
+
                 var json = _serializer.Serialize(message);
 
                 await _queueClient.SendMessageAsync(json, ct);

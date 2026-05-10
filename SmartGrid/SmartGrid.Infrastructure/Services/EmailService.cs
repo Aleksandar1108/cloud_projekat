@@ -1,20 +1,39 @@
 ﻿using Mailjet.Client;
 using Mailjet.Client.Resources;
 using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Logging;
 using SmartGrid.Application.Interfaces;
 using SmartGrid.Infrastructure.Common;
 
 namespace SmartGrid.Infrastructure.Services
 {
-    public class EmailService : IEmailService
+    public class EmailService(ILogger<EmailService> logger) : IEmailService
     {
         public async Task SendEmailAsync(string to, string subject, string link)
         {
+            var apiKey = Environment.GetEnvironmentVariable("MAILJET_API_KEY");
+            var apiSecret = Environment.GetEnvironmentVariable("MAILJET_API_SECRET");
+            var senderEmail = Environment.GetEnvironmentVariable("MAILJET_SENDER_EMAIL");
+            var senderName = Environment.GetEnvironmentVariable("MAILJET_SENDER_NAME");
+
+            // In local/dev setups these env vars are often missing; don't fail critical flows (registration, billing).
+            if (string.IsNullOrWhiteSpace(apiKey)
+                || string.IsNullOrWhiteSpace(apiSecret)
+                || string.IsNullOrWhiteSpace(senderEmail)
+                || string.IsNullOrWhiteSpace(senderName))
+            {
+                logger.LogDebug(
+                    "Mailjet env vars are not configured; skipping email send. To={To}, Subject={Subject}",
+                    to,
+                    subject);
+                return;
+            }
+
             var htmlBody = EmailTemplate.Activation(link);
 
             MailjetClient client = new MailjetClient(
-                Environment.GetEnvironmentVariable("MAILJET_API_KEY"),
-                Environment.GetEnvironmentVariable("MAILJET_API_SECRET")
+                apiKey,
+                apiSecret
             );
 
             MailjetRequest request = new MailjetRequest
@@ -22,7 +41,7 @@ namespace SmartGrid.Infrastructure.Services
                 Resource = Send.Resource,
             }
             .Property(Send.FromEmail, Environment.GetEnvironmentVariable("MAILJET_SENDER_EMAIL"))
-            .Property(Send.FromName, Environment.GetEnvironmentVariable("MAILJET_SENDER_NAME"))
+            .Property(Send.FromName, senderName)
             .Property(Send.Subject, subject)
             .Property(Send.TextPart, $"Activate your SmartGrid account by visiting this link: {link}")
             .Property(Send.HtmlPart, htmlBody)
@@ -36,9 +55,10 @@ namespace SmartGrid.Infrastructure.Services
 
             if (!response.IsSuccessStatusCode)
             {
-                Console.WriteLine($"StatusCode: {response.StatusCode}");
-                Console.WriteLine($"ErrorInfo: {response.GetErrorInfo()}");
-                Console.WriteLine($"ErrorMessage: {response.GetErrorMessage()}");
+                logger.LogWarning(
+                    "Mailjet send failed. StatusCode={StatusCode}, Error={ErrorMessage}",
+                    response.StatusCode,
+                    response.GetErrorMessage());
             }
         }
     }

@@ -2,12 +2,14 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { getMonthlyBilling } from "../../api_services/billing/BillingAPIService";
+import { createCheckoutSession } from "../../api_services/payments/PaymentsAPIService";
 import type { MonthlyBill } from "../../types/billing/MonthlyBill";
 
 function MonthlyBillingPage() {
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
+    const [isPaying, setIsPaying] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [filter, setFilter] = useState("");
     const [draftFilter, setDraftFilter] = useState("");
@@ -49,6 +51,22 @@ function MonthlyBillingPage() {
     const totalAmount = filteredBills.reduce((sum, bill) => sum + bill.totalCost, 0);
     const selectedBill = selectedIndex !== null ? filteredBills[selectedIndex] : null;
 
+    const handlePaySelected = async () => {
+        if (!selectedBill) return;
+
+        setIsPaying(true);
+        setError(null);
+
+        try {
+            const res = await createCheckoutSession(selectedBill.deviceId, selectedBill.year, selectedBill.month);
+            window.location.assign(res.url);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Neuspesno pokretanje placanja.");
+        } finally {
+            setIsPaying(false);
+        }
+    };
+
     useEffect(() => {
         void handleLoadBilling();
         // Load monthly billing view immediately; generation is done by backend schedule.
@@ -62,12 +80,29 @@ function MonthlyBillingPage() {
                     <h1 style={{ margin: 0, fontSize: "42px" }}>Mesecni obracun</h1>
                     <p>Pregled i detalji svih generisanih racuna.</p>
                 </div>
-                <button
-                    onClick={() => navigate("/")}
-                    style={{ background: "#eef2ff", border: "1px solid #dbeafe", borderRadius: "10px", padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}
-                >
-                    Nazad na dashboard
-                </button>
+                <div style={{ display: "flex", gap: "10px" }}>
+                    <button
+                        onClick={handlePaySelected}
+                        disabled={!selectedBill || isPaying}
+                        style={{
+                            backgroundColor: selectedBill ? "#16a34a" : "#d1d5db",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "10px",
+                            padding: "10px 14px",
+                            cursor: selectedBill && !isPaying ? "pointer" : "not-allowed",
+                            fontWeight: 800
+                        }}
+                    >
+                        {isPaying ? "Preusmeravanje..." : "Plati izabrani racun"}
+                    </button>
+                    <button
+                        onClick={() => navigate("/")}
+                        style={{ background: "#eef2ff", border: "1px solid #dbeafe", borderRadius: "10px", padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}
+                    >
+                        Nazad na dashboard
+                    </button>
+                </div>
             </section>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", marginBottom: "12px" }}>
