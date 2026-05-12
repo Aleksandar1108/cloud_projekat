@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using SmartGrid.Application;
 using SmartGrid.Infrastructure;
 using SmartGrid.WebApi.BackgroundServices;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -15,6 +18,25 @@ namespace SmartGrid.WebApi.Extensions
             // Add infrastructure & application layers
             services.AddInfrastructure(configuration)
                     .AddApplication();
+
+            var jwtKey = configuration["Jwt:Key"]
+                ?? throw new InvalidOperationException("Jwt:Key is not configured.");
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+                        ValidateIssuer = true,
+                        ValidIssuer = "SmartGrid",
+                        ValidateAudience = true,
+                        ValidAudience = "SmartGrid",
+                        ValidateLifetime = true,
+                        NameClaimType = "id"
+                    };
+                });
 
             // Controllers + JSON enums
             services.AddControllers()
