@@ -65,7 +65,8 @@ try
                                                     deviceName,
                                                     nominalPower,
                                                     currentVersion,
-                                                    deviceType);
+                                                    deviceType,
+                                                    delayMs);
         var (success, errorMessage) = await publisher.PublishSafeAsync(telemetry);
 
         if (success)

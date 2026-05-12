@@ -18,7 +18,8 @@ namespace SmartGrid.ITSimulator.Services
                                               string deviceName,
                                               double nominalPower,
                                               string firmwareVersion,
-                                              DeviceType deviceType)
+                                              DeviceType deviceType,
+                                              int intervalMilliseconds)
         {
             if (string.IsNullOrWhiteSpace(deviceId))
                 throw new ArgumentException("Device Id cannot be empty", nameof(deviceName));
@@ -34,6 +35,16 @@ namespace SmartGrid.ITSimulator.Services
 
             double currentPower = _random.NextDouble() * (nominalPower + _maxPowerVariation);
 
+            double hours = intervalMilliseconds / 3_600_000.0;
+            if (hours <= 0)
+                hours = 0.5;
+
+            double energyDeltaKwh = Math.Max(0, currentPower * hours);
+
+            double u1 = 220 + _random.NextDouble() * 15;
+            if (_random.NextDouble() < 0.12)
+                u1 = 165 + _random.NextDouble() * 20;
+
             return new TelemetryDTO
             {
                 DeviceId = deviceId,
@@ -42,7 +53,9 @@ namespace SmartGrid.ITSimulator.Services
                 NominalPower = nominalPower,
                 CurrentPower = currentPower,
                 FirmwareVersion = firmwareVersion,
-                DeviceType = deviceType.ToString()
+                DeviceType = deviceType.ToString(),
+                VoltageVoltsU1 = u1,
+                EnergyDeltaKwh = energyDeltaKwh
             };
         }
     }

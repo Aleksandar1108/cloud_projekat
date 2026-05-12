@@ -20,6 +20,10 @@ namespace SmartGrid.Application.Features.Telemetries.Commands
         public double CurrentPower { get; init; }
         public string FirmwareVersion { get; init; } = string.Empty;
         public DateTime Timestamp { get; init; }
+        public double? VoltageVoltsU1 { get; init; }
+        public double? VoltageVoltsU2 { get; init; }
+        public double? VoltageVoltsU3 { get; init; }
+        public double? EnergyDeltaKwh { get; init; }
     }
 
     // VALIDATOR
@@ -50,6 +54,24 @@ namespace SmartGrid.Application.Features.Telemetries.Commands
             RuleFor(t => t.Timestamp)
                 .NotEmpty().WithMessage("Timestamp is required.")
                 .LessThanOrEqualTo(DateTime.UtcNow).WithMessage("Timestamp cannot be in the future.");
+
+            When(t => t.EnergyDeltaKwh.HasValue, () =>
+            {
+                RuleFor(t => t.EnergyDeltaKwh!.Value).GreaterThanOrEqualTo(0);
+            });
+
+            When(t => t.VoltageVoltsU1.HasValue, () =>
+            {
+                RuleFor(t => t.VoltageVoltsU1!.Value).InclusiveBetween(0, 500);
+            });
+            When(t => t.VoltageVoltsU2.HasValue, () =>
+            {
+                RuleFor(t => t.VoltageVoltsU2!.Value).InclusiveBetween(0, 500);
+            });
+            When(t => t.VoltageVoltsU3.HasValue, () =>
+            {
+                RuleFor(t => t.VoltageVoltsU3!.Value).InclusiveBetween(0, 500);
+            });
         }
     }
 
@@ -68,8 +90,11 @@ namespace SmartGrid.Application.Features.Telemetries.Commands
                 request.NominalPower,
                 request.CurrentPower,
                 request.Timestamp,
-                request.FirmwareVersion
-            );
+                request.FirmwareVersion,
+                request.VoltageVoltsU1,
+                request.VoltageVoltsU2,
+                request.VoltageVoltsU3,
+                request.EnergyDeltaKwh);
 
             if (telemetryResult.IsFailure)
                 return Result.Failure(telemetryResult.Error!.Message, ErrorType.Validation);

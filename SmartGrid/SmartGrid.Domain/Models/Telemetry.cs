@@ -16,6 +16,14 @@ namespace SmartGrid.Domain.Models
         public DateTime Timestamp { get; private set; }
         public Percentage LoadPercentage { get; private set; }
 
+        /// <summary>Optional phase voltages (V). Mono typically sends U1 only.</summary>
+        public double? VoltageVoltsU1 { get; private set; }
+        public double? VoltageVoltsU2 { get; private set; }
+        public double? VoltageVoltsU3 { get; private set; }
+
+        /// <summary>Energy consumed in this interval (kWh), for monthly limit checks.</summary>
+        public double? EnergyDeltaKwh { get; private set; }
+
         private Telemetry(
             EntityId id,
             EntityId deviceId,
@@ -24,7 +32,11 @@ namespace SmartGrid.Domain.Models
             Power nominalPower,
             Power currentPower,
             DateTime timestamp,
-            FirmwareVersion firmwareVersion)
+            FirmwareVersion firmwareVersion,
+            double? voltageVoltsU1,
+            double? voltageVoltsU2,
+            double? voltageVoltsU3,
+            double? energyDeltaKwh)
         {
             Id = id;
             DeviceId = deviceId;
@@ -34,9 +46,22 @@ namespace SmartGrid.Domain.Models
             CurrentPower = currentPower;
             Timestamp = timestamp;
             FirmwareVersion = firmwareVersion;
+            VoltageVoltsU1 = voltageVoltsU1;
+            VoltageVoltsU2 = voltageVoltsU2;
+            VoltageVoltsU3 = voltageVoltsU3;
+            EnergyDeltaKwh = energyDeltaKwh;
             LoadPercentage = nominalPower.Value > 0
                 ? Percentage.FromRaw(Math.Round((currentPower.Value / nominalPower.Value) * 100, 2))
                 : Percentage.Zero();
+        }
+
+        public double? GetMinimumReportedVoltageVolts()
+        {
+            var values = new List<double>(3);
+            if (VoltageVoltsU1.HasValue) values.Add(VoltageVoltsU1.Value);
+            if (VoltageVoltsU2.HasValue) values.Add(VoltageVoltsU2.Value);
+            if (VoltageVoltsU3.HasValue) values.Add(VoltageVoltsU3.Value);
+            return values.Count == 0 ? null : values.Min();
         }
 
         #region Factory Method
@@ -48,7 +73,11 @@ namespace SmartGrid.Domain.Models
             double nominalPower,
             double currentPower,
             DateTime timestamp,
-            string firmwareVersion)
+            string firmwareVersion,
+            double? voltageVoltsU1 = null,
+            double? voltageVoltsU2 = null,
+            double? voltageVoltsU3 = null,
+            double? energyDeltaKwh = null)
         {
             if (string.IsNullOrWhiteSpace(deviceName))
                 return Result<Telemetry>.Failure("DeviceName is required.",
@@ -83,6 +112,12 @@ namespace SmartGrid.Domain.Models
             if (firmwareVersionResult.IsFailure)
                 return Result<Telemetry>.Failure(firmwareVersionResult.Error!.Message, ErrorType.Validation);
 
+            if (energyDeltaKwh is < 0)
+                return Result<Telemetry>.Failure("EnergyDeltaKwh cannot be negative.", ErrorType.Validation);
+
+            if (voltageVoltsU1 is < 0 or > 500 || voltageVoltsU2 is < 0 or > 500 || voltageVoltsU3 is < 0 or > 500)
+                return Result<Telemetry>.Failure("Voltage values must be between 0 and 500 V.", ErrorType.Validation);
+
             return Result<Telemetry>.Success(new Telemetry(
                 EntityId.New(),
                 idResult.Value,
@@ -91,7 +126,11 @@ namespace SmartGrid.Domain.Models
                 nominalPowerResult.Value,
                 currentPowerResult.Value,
                 timestamp,
-                firmwareVersionResult.Value
+                firmwareVersionResult.Value,
+                voltageVoltsU1,
+                voltageVoltsU2,
+                voltageVoltsU3,
+                energyDeltaKwh
             ));
         }
         public static Result<Telemetry> Load(
@@ -102,7 +141,11 @@ namespace SmartGrid.Domain.Models
             double nominalPower,
             double currentPower,
             DateTime timestamp,
-            string firmwareVersion)
+            string firmwareVersion,
+            double? voltageVoltsU1 = null,
+            double? voltageVoltsU2 = null,
+            double? voltageVoltsU3 = null,
+            double? energyDeltaKwh = null)
         {
             var idResult = EntityId.Create(id);
             if (idResult.IsFailure)
@@ -124,6 +167,12 @@ namespace SmartGrid.Domain.Models
             if (firmwareResult.IsFailure)
                 return Result<Telemetry>.Failure(firmwareResult.Error!.Message, ErrorType.Validation);
 
+            if (energyDeltaKwh is < 0)
+                return Result<Telemetry>.Failure("EnergyDeltaKwh cannot be negative.", ErrorType.Validation);
+
+            if (voltageVoltsU1 is < 0 or > 500 || voltageVoltsU2 is < 0 or > 500 || voltageVoltsU3 is < 0 or > 500)
+                return Result<Telemetry>.Failure("Voltage values must be between 0 and 500 V.", ErrorType.Validation);
+
             var telemetry = new Telemetry(
                 idResult.Value,
                 deviceIdResult.Value,
@@ -132,7 +181,11 @@ namespace SmartGrid.Domain.Models
                 nominalPowerResult.Value,
                 currentPowerResult.Value,
                 timestamp,
-                firmwareResult.Value);
+                firmwareResult.Value,
+                voltageVoltsU1,
+                voltageVoltsU2,
+                voltageVoltsU3,
+                energyDeltaKwh);
 
             return Result<Telemetry>.Success(telemetry);
         }

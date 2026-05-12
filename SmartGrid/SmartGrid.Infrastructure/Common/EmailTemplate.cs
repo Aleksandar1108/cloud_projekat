@@ -67,5 +67,14 @@
 
         </body>
         </html>";
+
+    public static string SimpleNotification(string title, string message) => $@"
+        <!DOCTYPE html>
+        <html><head><meta charset='UTF-8'/></head>
+        <body style='font-family:Arial,sans-serif;background:#f4f6f8;padding:24px;'>
+        <div style='max-width:560px;margin:0 auto;background:#fff;padding:24px;border-radius:8px;'>
+        <h2 style='color:#1f2937;margin-top:0;'>{title}</h2>
+        <p style='color:#374151;line-height:1.5;'>{message}</p>
+        </div></body></html>";
     }
 }

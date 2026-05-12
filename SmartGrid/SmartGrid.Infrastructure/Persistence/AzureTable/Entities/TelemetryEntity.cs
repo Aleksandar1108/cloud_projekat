@@ -9,5 +9,9 @@
         public double Load { get; set; }
         public string FirmwareVersion { get; set; } = default!;
         public DateTime ObservationTime { get; set; }
+        public double? VoltageVoltsU1 { get; set; }
+        public double? VoltageVoltsU2 { get; set; }
+        public double? VoltageVoltsU3 { get; set; }
+        public double? EnergyDeltaKwh { get; set; }
     }
 }

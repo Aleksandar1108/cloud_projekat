@@ -38,17 +38,34 @@ namespace SmartGrid.WebApi.Extensions
                 }
             }
 
+            string clientMessage;
+            object? errorsPayload = null;
+            if (result.Error?.Type == ErrorType.Validation)
+            {
+                if (finalMessage is Dictionary<string, string[]> dict)
+                {
+                    errorsPayload = dict;
+                    clientMessage = "Validation failed.";
+                }
+                else
+                    clientMessage = finalMessage.ToString() ?? result.Error.Message;
+            }
+            else
+                clientMessage = finalMessage.ToString() ?? result.Error?.Message ?? "An error occurred.";
+
             var errorResponse = new
             {
                 type = result.Error?.Type.ToString(),
-                errors = result.Error?.Type == ErrorType.Validation ? finalMessage : null,
-                message = result.Error?.Type != ErrorType.Validation ? finalMessage : "Validation failed."
+                errors = errorsPayload,
+                message = clientMessage
             };
 
             return result.Error?.Type switch
             {
                 ErrorType.Validation => new BadRequestObjectResult(errorResponse),
                 ErrorType.NotFound => new NotFoundObjectResult(errorResponse),
+                ErrorType.Unauthorized => new UnauthorizedObjectResult(errorResponse),
+                ErrorType.Conflict => new ConflictObjectResult(errorResponse),
                 ErrorType.Unexpected => new ObjectResult(errorResponse) { StatusCode = 500 },
                 _ => new BadRequestObjectResult(errorResponse)
             };

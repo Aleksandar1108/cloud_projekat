@@ -5,7 +5,7 @@ using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Domain.Common;
 using SmartGrid.Domain.Enums;
 using SmartGrid.Domain.Models;
-using SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories;
+using SmartGrid.Domain.ValueObjects.User;
 
 namespace SmartGrid.Application.Features.Users.Command
 {
@@ -26,6 +26,10 @@ namespace SmartGrid.Application.Features.Users.Command
         {
             try
             {
+                var emailResult = Email.Create(request.Email);
+                if (emailResult.IsFailure)
+                    return Result<AuthResponse>.Failure(emailResult.Error!.Message, ErrorType.Validation);
+
                 var existing = await userRepository.GetByEmailAsync(request.Email);
                 if (existing is not null)
                     return Result<AuthResponse>.Failure("User already exists", ErrorType.Conflict);
@@ -41,7 +45,14 @@ namespace SmartGrid.Application.Features.Users.Command
 
                 var token = jwtService.GenerateToken(user);
 
-                await emailService.SendEmailAsync(user.Email, "Activate your SmartGrid account", activation.Token.Value);
+                try
+                {
+                    await emailService.SendEmailAsync(user.Email, "Activate your SmartGrid account", activation.Token.Value);
+                }
+                catch (Exception mailEx)
+                {
+                    logger.LogWarning(mailEx, "Activation email was not sent for user {Email}", user.Email);
+                }
 
                 return Result<AuthResponse>.Success(new AuthResponse(token, DateTime.UtcNow.AddHours(2)));
 
@@ -49,7 +60,10 @@ namespace SmartGrid.Application.Features.Users.Command
             catch (Exception ex)
             {
                 logger.LogError(ex, "Registration failed");
-                return Result<AuthResponse>.Failure("Registration failed", ErrorType.Failure);
+                var reason = ex.GetBaseException().Message;
+                if (reason.Length > 400)
+                    reason = reason[..400] + "...";
+                return Result<AuthResponse>.Failure($"Registration failed: {reason}", ErrorType.Failure);
             }
         }
     }

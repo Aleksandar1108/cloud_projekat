@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Domain.Models;
 using SmartGrid.Domain.ValueObjects.User;
 using SmartGrid.Infrastructure.Persistence.SQLDatabase.Common;

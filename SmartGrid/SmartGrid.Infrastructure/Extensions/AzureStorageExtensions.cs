@@ -50,6 +50,8 @@ namespace SmartGrid.Infrastructure.Extensions
             services.AddScoped<IDeviceStatusQueryRepository, DeviceStatusQueryRepository>();
             services.AddScoped<IMonthlyBillRepository, MonthlyBillRepository>();
             services.AddScoped<IManualReadingRepository, ManualReadingRepository>();
+            services.AddScoped<ITariffModelRepository, TariffModelAzureTableRepository>();
+            services.AddScoped<IConsumptionLimitRepository, ConsumptionLimitAzureTableRepository>();
 
             return services;
         }

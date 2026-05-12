@@ -40,8 +40,32 @@ namespace SmartGrid.Infrastructure.Persistence.AzureTable.Repositories
             }
             catch (RequestFailedException ex) when (ex.Status == 404)
             {
-                // If Telemetries table is not created yet, treat it as no data for billing.
                 return Array.Empty<Telemetry>();
+            }
+        }
+
+        public async Task<double> GetEnergyDeltaKwhSumForDeviceUtcMonthAsync(
+            string deviceId,
+            int year,
+            int month,
+            CancellationToken ct = default)
+        {
+            var start = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);
+            var end = start.AddMonths(1);
+            var startS = start.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture);
+            var endS = end.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture);
+            var escapedDevice = deviceId.Replace("'", "''");
+            var filter =
+                $"PartitionKey eq '{escapedDevice}' and ObservationTime ge datetime'{startS}' and ObservationTime lt datetime'{endS}'";
+
+            try
+            {
+                var rows = await base.QueryAsync(filter, ct);
+                return rows.Sum(t => t.EnergyDeltaKwh ?? 0);
+            }
+            catch (RequestFailedException ex) when (ex.Status == 404)
+            {
+                return 0;
             }
         }
     }

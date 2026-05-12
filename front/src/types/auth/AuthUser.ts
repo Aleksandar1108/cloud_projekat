@@ -1,6 +1,6 @@
 import type { UserRole } from "../../enums/user/UserRole";
 export type AuthUser = {
-    id: number;
+    id: string;
     username: string;
     role: UserRole;
 };

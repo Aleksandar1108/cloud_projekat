@@ -20,6 +20,7 @@ namespace SmartGrid.Infrastructure
             services.Configure<ParallelSettings>(configuration.GetSection("ParallelSettings"));
             services.Configure<SQLServerOptions>(configuration.GetSection("SQLServer"));
             services.Configure<SmtpOptions>(configuration.GetSection("Smtp"));
+            services.Configure<AlertNotificationOptions>(configuration.GetSection(AlertNotificationOptions.SectionName));
 
             var tableConn = configuration.GetValue<string>("AzureTableOptions:ConnectionString")
                 ?? throw new InvalidOperationException("AzureTableOptions:ConnectionString is not configured.");

@@ -9,5 +9,8 @@
         public string FirmwaresTable { get; init; } = string.Empty;
         public string MonthlyBillsTable { get; init; } = string.Empty;
         public string ManualReadingsTable { get; init; } = string.Empty;
+        public string ConsumptionLimitsTable { get; init; } = string.Empty;
+        public string ConsumptionLimitNotifiedTable { get; init; } = string.Empty;
+        public string TariffModelsTable { get; init; } = string.Empty;
     }
 }

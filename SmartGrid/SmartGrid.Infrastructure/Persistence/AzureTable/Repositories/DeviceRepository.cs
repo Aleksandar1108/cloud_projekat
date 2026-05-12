@@ -36,6 +36,19 @@ namespace SmartGrid.Infrastructure.Persistence.AzureTable.Repositories
         {
             return await base.GetByIdAsync(deviceType.ToString(), deviceId, ct);
         }
+
+        public async Task<Device?> GetByIdAnyTypeAsync(EntityId deviceId, CancellationToken ct = default)
+        {
+            foreach (var type in new[] { DeviceType.SolarPanel, DeviceType.WindTurbine })
+            {
+                var device = await GetByIdAsync(type, deviceId, ct);
+                if (device is not null)
+                    return device;
+            }
+
+            return null;
+        }
+
         public async Task<Device?> GetWithStatusByIdAsync(DeviceType deviceType, EntityId deviceId, CancellationToken ct = default)
         {
             var partitionKey = deviceType.ToString();

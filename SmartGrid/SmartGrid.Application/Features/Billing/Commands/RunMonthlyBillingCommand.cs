@@ -6,7 +6,6 @@ using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Application.Interfaces.Storage;
 using SmartGrid.Domain.Common;
 using SmartGrid.Domain.Enums;
-using SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories;
 using System.Text;
 
 namespace SmartGrid.Application.Features.Billing.Commands
@@ -64,7 +63,7 @@ namespace SmartGrid.Application.Features.Billing.Commands
             if (tariffModel is null)
             {
                 return Result<IReadOnlyCollection<MonthlyBillDto>>.Failure(
-                    "No active tariff model found. Define and activate one in SQL.",
+                    "No active tariff model found. Add an active row to the Azure Table configured as TariffModelsTable (PartitionKey = TariffModels, IsActive = true).",
                     ErrorType.NotFound);
             }
 
