@@ -31,9 +31,13 @@ namespace SmartGrid.Infrastructure.Extensions
             });
             services.AddScoped<IDatabaseMapper<User, UserEntity>, UserMapper>();
             services.AddScoped<IDatabaseMapper<EmailActivation, EmailActivationEntity>, EmailActivationMapper>();
+            services.AddScoped<IDatabaseMapper<Property, PropertyEntity>, PropertyMapper>();
+            services.AddScoped<IDatabaseMapper<SmartMeter, SmartMeterEntity>, SmartMeterMapper>();
             services.AddScoped<IEmailActivationRepository, EmailActivationRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ITariffModelRepository, TariffModelRepository>();
+            services.AddScoped<IPropertyRepository, PropertyRepository>();
+            services.AddScoped<ISmartMeterRepository, SmartMeterRepository>();
 
             return services;
         }

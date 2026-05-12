@@ -8,6 +8,8 @@ import MonthlyBillingPage from './pages/billing/MonthlyBillingPage'
 import ManualReadingsPage from './pages/manual_readings/ManualReadingsPage'
 import PaymentSuccessPage from './pages/payments/PaymentSuccessPage'
 import PaymentCancelPage from './pages/payments/PaymentCancelPage'
+import PropertiesPage from './pages/properties/PropertiesPage'
+import PropertyDetailPage from './pages/properties/PropertyDetailPage'
 
 function App() {
 
@@ -21,6 +23,8 @@ function App() {
       <Route path='/manual-readings' element = {<ManualReadingsPage />}></Route>
       <Route path='/payment/success' element = {<PaymentSuccessPage />}></Route>
       <Route path='/payment/cancel' element = {<PaymentCancelPage />}></Route>
+      <Route path='/properties' element = {<PropertiesPage />}></Route>
+      <Route path='/properties/:id' element = {<PropertyDetailPage />}></Route>
       <Route path='/404' element = {<PageNotFound />}></Route>
       <Route path="*" element={<Navigate to="/404" replace />} />
     </Routes>

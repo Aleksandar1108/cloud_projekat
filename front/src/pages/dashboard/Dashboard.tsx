@@ -43,6 +43,21 @@ function DashboardPage(){
                     >
                         Rucni unos potrosnje
                     </button>
+                    <button
+                        onClick={() => navigate("/properties")}
+                        style={{
+                            backgroundColor: "#7c3aed",
+                            color: "var(--white)",
+                            border: "none",
+                            padding: "10px 16px",
+                            borderRadius: "6px",
+                            cursor: "pointer",
+                            fontWeight: "bold",
+                            marginLeft: "8px"
+                        }}
+                    >
+                        Moji objekti
+                    </button>
                 </section>
             )}
         </main>

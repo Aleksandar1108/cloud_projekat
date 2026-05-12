@@ -11,6 +11,8 @@ public class SmartGridDbContext : DbContext
     public DbSet<UserEntity> Users { get; set; } = null!;
     public DbSet<EmailActivationEntity> EmailActivations { get; set; } = null!;
     public DbSet<TariffModelEntity> TariffModels { get; set; } = null!;
+    public DbSet<PropertyEntity> Properties { get; set; } = null!;
+    public DbSet<SmartMeterEntity> SmartMeters { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -59,6 +61,43 @@ public class SmartGridDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(e => e.UserId)
                   .HasPrincipalKey(u => u.IdUsers);
+        });
+
+        modelBuilder.Entity<PropertyEntity>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired();
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.City).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Address).IsRequired().HasMaxLength(255);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.PropertyType).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.CreatedAt).IsRequired();
+
+            entity.HasOne<UserEntity>()
+                  .WithMany()
+                  .HasForeignKey(e => e.UserId)
+                  .HasPrincipalKey(u => u.IdUsers);
+        });
+
+        modelBuilder.Entity<SmartMeterEntity>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.PropertyId).IsRequired();
+            entity.Property(e => e.Label).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.ConnectionType).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.MaxApprovedPower).IsRequired();
+            entity.Property(e => e.Note).HasMaxLength(500);
+            entity.Property(e => e.SerialNumber).HasMaxLength(20);
+            entity.Property(e => e.PairingStatus).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.DeviceUUID).HasMaxLength(50);
+            entity.Property(e => e.AccessToken).HasMaxLength(255);
+            entity.Property(e => e.CreatedAt).IsRequired();
+
+            entity.HasOne<PropertyEntity>()
+                  .WithMany()
+                  .HasForeignKey(e => e.PropertyId)
+                  .HasPrincipalKey(p => p.Id);
         });
 
         modelBuilder.Entity<TariffModelEntity>(entity =>
