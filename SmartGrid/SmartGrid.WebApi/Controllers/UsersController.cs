@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SmartGrid.Application.Features.Users.Command;
 using SmartGrid.WebApi.DTOs;
 using SmartGrid.WebApi.Extensions;
+using System.Linq;
 
 namespace SmartGrid.WebApi.Controllers;
 
@@ -40,6 +41,21 @@ public class UsersController(IMediator mediator) : ControllerBase
             request.Email,
             request.Password
         );
+
+        var result = await mediator.Send(command);
+
+        return result.ToActionResult();
+    }
+
+    [HttpPost("activate")]
+    public async Task<IActionResult> Activate([FromBody] ActivateUserRequestDTO request)
+    {
+        if (request is null)
+        {
+            return BadRequest(new { message = "Invalid or empty JSON payload." });
+        }
+
+        var command = new ActivateUserCommand(request.Token);
 
         var result = await mediator.Send(command);
 

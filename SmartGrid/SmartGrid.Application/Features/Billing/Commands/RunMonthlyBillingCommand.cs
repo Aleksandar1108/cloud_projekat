@@ -6,7 +6,6 @@ using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Application.Interfaces.Storage;
 using SmartGrid.Domain.Common;
 using SmartGrid.Domain.Enums;
-using SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories;
 using System.Text;
 
 namespace SmartGrid.Application.Features.Billing.Commands

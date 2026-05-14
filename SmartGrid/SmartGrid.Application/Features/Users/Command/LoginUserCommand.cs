@@ -2,9 +2,9 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SmartGrid.Application.Interfaces;
+using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Domain.Common;
 using SmartGrid.Domain.Enums;
-using SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories;
 
 namespace SmartGrid.Application.Features.Users.Command
 {

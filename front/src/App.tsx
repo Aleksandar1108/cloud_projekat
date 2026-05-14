@@ -10,6 +10,7 @@ import PaymentSuccessPage from './pages/payments/PaymentSuccessPage'
 import PaymentCancelPage from './pages/payments/PaymentCancelPage'
 import PropertiesPage from './pages/properties/PropertiesPage'
 import PropertyDetailPage from './pages/properties/PropertyDetailPage'
+import ActivateAccountPage from './pages/auth/ActivateAccountPage'
 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
       <Route path='/properties' element = {<PropertiesPage />}></Route>
       <Route path='/properties/:id' element = {<PropertyDetailPage />}></Route>
       <Route path='/404' element = {<PageNotFound />}></Route>
+      <Route path="/activate" element={<ActivateAccountPage />} />
       <Route path="*" element={<Navigate to="/404" replace />} />
     </Routes>
   </>

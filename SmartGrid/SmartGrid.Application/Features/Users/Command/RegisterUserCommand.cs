@@ -6,7 +6,6 @@ using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Domain.Common;
 using SmartGrid.Domain.Enums;
 using SmartGrid.Domain.Models;
-using SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories;
 
 namespace SmartGrid.Application.Features.Users.Command
 {
@@ -43,7 +42,10 @@ namespace SmartGrid.Application.Features.Users.Command
 
                 var token = jwtService.GenerateToken(user);
 
-                await emailService.SendEmailAsync(user.Email, "Activate your SmartGrid account", activation.Token.Value, ct);
+                var frontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URL");
+                var link = $"{frontendUrl}/activate?token={activation.Token.Value}";
+
+                await emailService.SendActivationEmailAsync(user.Email, "Activate your SmartGrid account", link, ct);
                 return Result<AuthResponse>.Success(new AuthResponse(token, DateTime.UtcNow.AddHours(2)));
 
             }

@@ -1,7 +1,7 @@
 ﻿using SmartGrid.Domain.Models;
 using SmartGrid.Domain.ValueObjects.User;
 
-namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories
+namespace SmartGrid.Application.Interfaces.Repositories
 {
     public interface IUserRepository
     {

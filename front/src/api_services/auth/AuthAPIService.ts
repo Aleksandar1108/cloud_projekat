@@ -63,5 +63,30 @@ export const AuthAPIService: IAuthAPIService = {
                 error: "Server error"
             };
         }
+    },
+
+    async activateUser(token: string): Promise<AuthResponse>{
+        try{
+            return await axios.post<AuthResponse>(
+                buildApiUrl("users/activate"),
+                { token }
+            ).then(res => res.data);
+        }
+        catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
+                const data: any = error.response.data;
+
+                return {
+                    error:
+                        data.message ||
+                        data.type ||
+                        "Unknown error"
+                };
+            }
+
+            return {
+                error: "Server error"
+            };
+        }
     }
 }
