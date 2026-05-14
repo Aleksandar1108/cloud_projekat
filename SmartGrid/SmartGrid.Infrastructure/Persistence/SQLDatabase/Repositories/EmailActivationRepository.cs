@@ -19,32 +19,31 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories
             _mapper = mapper;
         }
 
-        public async Task AddAsync(EmailActivation activation)
+        public async Task AddAsync(EmailActivation activation, CancellationToken ct)
         {
             var entity = _mapper.ToEntity(activation);
 
-            await _context.EmailActivations.AddAsync(entity);
-            await _context.SaveChangesAsync();
+            await _context.EmailActivations.AddAsync(entity,ct);
+            await _context.SaveChangesAsync(ct);
         }
 
-        public async Task DeleteAsync(EmailActivation activation)
+        public async Task DeleteAsync(EmailActivation activation, CancellationToken ct)
         {
             var entity = await _context.EmailActivations
-                .FirstOrDefaultAsync(x => x.IdEmailActivation == activation.Id.Value);
+                .FirstOrDefaultAsync(x => x.IdEmailActivation == activation.Id.Value,ct);
 
             if (entity is null)
                 return;
 
             _context.EmailActivations.Remove(entity);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(ct);
         }
 
-        public async Task<EmailActivation?> GetByTokenAsync(string token)
+        public async Task<EmailActivation?> GetByTokenAsync(string token, CancellationToken ct)
         {
             var entity = await _context.EmailActivations
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.ActivationToken == token);
-
+                .FirstOrDefaultAsync(x => x.ActivationToken == token, ct);
             return entity is null ? null : _mapper.ToDomain(entity);
         }
     }

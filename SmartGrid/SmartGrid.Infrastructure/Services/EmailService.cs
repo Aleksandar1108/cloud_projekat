@@ -9,7 +9,7 @@ namespace SmartGrid.Infrastructure.Services
 {
     public class EmailService(ILogger<EmailService> logger) : IEmailService
     {
-        public async Task SendEmailAsync(string to, string subject, string link)
+        public async Task SendEmailAsync(string to, string subject, string link,CancellationToken ct)
         {
             var apiKey = Environment.GetEnvironmentVariable("MAILJET_API_KEY");
             var apiSecret = Environment.GetEnvironmentVariable("MAILJET_API_SECRET");

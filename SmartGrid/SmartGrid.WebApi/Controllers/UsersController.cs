@@ -11,7 +11,7 @@ namespace SmartGrid.WebApi.Controllers;
 public class UsersController(IMediator mediator) : ControllerBase
 {
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] UserRequestDTO request)
+    public async Task<IActionResult> Register([FromBody] UserRequestDTO request, CancellationToken ct)
     {
         if (request is null)
         {
@@ -23,7 +23,7 @@ public class UsersController(IMediator mediator) : ControllerBase
             request.Password
         );
 
-        var result = await mediator.Send(command);
+        var result = await mediator.Send(command, ct);
 
         return result.ToActionResult();
     }

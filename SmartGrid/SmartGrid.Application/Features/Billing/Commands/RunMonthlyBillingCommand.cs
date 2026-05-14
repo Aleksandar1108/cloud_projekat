@@ -141,7 +141,7 @@ namespace SmartGrid.Application.Features.Billing.Commands
         {
             try
             {
-                var users = await userRepository.GetAllAsync();
+                var users = await userRepository.GetAllAsync(ct);
                 var recipients = users
                     .Where(u => u.Role == UserRole.User)
                     .Select(u => u.Email.Value)
@@ -170,7 +170,8 @@ namespace SmartGrid.Application.Features.Billing.Commands
                     await emailService.SendEmailAsync(
                         recipient,
                         $"SmartGrid - Mesecni obracun {year:D4}-{month:D2}",
-                        body);
+                        body,
+                        ct);
                 }
 
             }

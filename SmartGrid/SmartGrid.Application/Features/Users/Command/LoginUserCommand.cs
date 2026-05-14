@@ -23,7 +23,7 @@ namespace SmartGrid.Application.Features.Users.Command
         {
             try
             {
-                var existing = await userRepository.GetByEmailAsync(request.Email);
+                var existing = await userRepository.GetByEmailAsync(request.Email, ct);
                 if (existing is null)
                     return Result<AuthResponse>.Failure("User does not exist", ErrorType.NotFound);
 

@@ -28,23 +28,22 @@ namespace SmartGrid.Application.Features.Users.Command
         {
             try
             {
-                var existing = await userRepository.GetByEmailAsync(request.Email);
+                var existing = await userRepository.GetByEmailAsync(request.Email,ct);
                 if (existing is not null)
                     return Result<AuthResponse>.Failure("User already exists", ErrorType.Conflict);
 
                 var user = User.Create(request.Email, request.Password);
 
-                await userRepository.AddAsync(user);
+                await userRepository.AddAsync(user,ct);
 
 
                 var activation = EmailActivation.Create(user.Id);
 
-                await emailActivationRepository.AddAsync(activation);
+                await emailActivationRepository.AddAsync(activation,ct);
 
                 var token = jwtService.GenerateToken(user);
 
-                await emailService.SendEmailAsync(user.Email, "Activate your SmartGrid account", activation.Token.Value);
-
+                await emailService.SendEmailAsync(user.Email, "Activate your SmartGrid account", activation.Token.Value, ct);
                 return Result<AuthResponse>.Success(new AuthResponse(token, DateTime.UtcNow.AddHours(2)));
 
             }

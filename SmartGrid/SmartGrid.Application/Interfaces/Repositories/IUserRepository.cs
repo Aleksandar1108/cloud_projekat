@@ -5,12 +5,12 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories
 {
     public interface IUserRepository
     {
-        Task<User?> GetByIdAsync(UserId id);
-        Task<User?> GetByEmailAsync(string email);
-        Task<IReadOnlyCollection<User>> GetAllAsync();
+        Task<User?> GetByIdAsync(UserId id, CancellationToken ct);
+        Task<User?> GetByEmailAsync(string email, CancellationToken ct);
+        Task<IReadOnlyCollection<User>> GetAllAsync(CancellationToken ct);
 
-        Task AddAsync(User user);
-        Task UpdateAsync(User user);
-        Task DeleteAsync(UserId id);
+        Task AddAsync(User user, CancellationToken ct);
+        Task UpdateAsync(User user, CancellationToken ct);
+        Task DeleteAsync(UserId id, CancellationToken ct);
     }
 }
