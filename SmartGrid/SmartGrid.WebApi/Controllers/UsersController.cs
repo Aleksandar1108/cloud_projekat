@@ -48,16 +48,16 @@ public class UsersController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost("activate")]
-    public async Task<IActionResult> Activate([FromBody] ActivateUserRequestDTO request)
+    public async Task<IActionResult> Activate([FromBody] ActivateUserRequestDTO request, CancellationToken ct)
     {
         if (request is null)
         {
             return BadRequest(new { message = "Invalid or empty JSON payload." });
         }
 
-        var command = new ActivateUserCommand(request.Token);
+        var command = new ActivateUserCommand(request.Token, request.Password);
 
-        var result = await mediator.Send(command);
+        var result = await mediator.Send(command,ct);
 
         return result.ToActionResult();
     }

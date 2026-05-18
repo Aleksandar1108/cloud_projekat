@@ -43,7 +43,7 @@ namespace SmartGrid.Application.Features.Users.Command
                 var token = jwtService.GenerateToken(user);
 
                 var frontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URL");
-                var link = $"{frontendUrl}/activate?token={activation.Token.Value}";
+                var link = $"{frontendUrl}activate?token={activation.Token.Value}";
 
                 await emailService.SendActivationEmailAsync(user.Email, "Activate your SmartGrid account", link, ct);
                 return Result<AuthResponse>.Success(new AuthResponse(token, DateTime.UtcNow.AddHours(2)));

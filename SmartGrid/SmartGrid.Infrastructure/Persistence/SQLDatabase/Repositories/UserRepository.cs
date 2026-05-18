@@ -62,6 +62,8 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories
             entity.Email = user.Email.Value;
             entity.Password = user.Password.Value;
             entity.Role = user.Role.ToString();
+            entity.AccountCreated = user.AccountCreated;
+            entity.IsActive = user.ActivationStatus.Value;
 
             _context.Users.Update(entity);
             await _context.SaveChangesAsync(ct);

@@ -65,11 +65,11 @@ export const AuthAPIService: IAuthAPIService = {
         }
     },
 
-    async activateUser(token: string): Promise<AuthResponse>{
+    async activateUser(token: string,password:string): Promise<AuthResponse>{
         try{
             return await axios.post<AuthResponse>(
                 buildApiUrl("users/activate"),
-                { token }
+                { token,password }
             ).then(res => res.data);
         }
         catch (error) {

@@ -41,9 +41,7 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories
 
         public async Task<EmailActivation?> GetByTokenAsync(string token, CancellationToken ct)
         {
-            var entity = await _context.EmailActivations
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.ActivationToken == token, ct);
+            var entity = await _context.EmailActivations.AsNoTracking().FirstOrDefaultAsync(x => x.ActivationToken == token, ct);
             return entity is null ? null : _mapper.ToDomain(entity);
         }
     }
