@@ -6,7 +6,6 @@ using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Application.Interfaces.Storage;
 using SmartGrid.Domain.Common;
 using SmartGrid.Domain.Enums;
-using SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories;
 using System.Text;
 
 namespace SmartGrid.Application.Features.Billing.Commands
@@ -141,7 +140,7 @@ namespace SmartGrid.Application.Features.Billing.Commands
         {
             try
             {
-                var users = await userRepository.GetAllAsync();
+                var users = await userRepository.GetAllAsync(ct);
                 var recipients = users
                     .Where(u => u.Role == UserRole.User)
                     .Select(u => u.Email.Value)
@@ -170,7 +169,8 @@ namespace SmartGrid.Application.Features.Billing.Commands
                     await emailService.SendEmailAsync(
                         recipient,
                         $"SmartGrid - Mesecni obracun {year:D4}-{month:D2}",
-                        body);
+                        body,
+                        ct);
                 }
 
             }

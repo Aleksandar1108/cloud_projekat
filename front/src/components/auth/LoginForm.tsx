@@ -118,6 +118,9 @@ export default function LoginForm({ handleSubmit, onSubmit, register, errors }: 
                     fontWeight: 700,
                 }}
             />
+            <label>
+                <a href="/forgot-password">forgot password?</a>
+            </label>
         </form>
     );
 }

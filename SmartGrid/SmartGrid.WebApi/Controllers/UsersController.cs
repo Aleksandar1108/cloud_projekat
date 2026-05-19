@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SmartGrid.Application.Features.Users.Command;
 using SmartGrid.WebApi.DTOs;
 using SmartGrid.WebApi.Extensions;
+using System.Linq;
 
 namespace SmartGrid.WebApi.Controllers;
 
@@ -11,7 +12,7 @@ namespace SmartGrid.WebApi.Controllers;
 public class UsersController(IMediator mediator) : ControllerBase
 {
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] UserRequestDTO request)
+    public async Task<IActionResult> Register([FromBody] UserRequestDTO request, CancellationToken ct)
     {
         if (request is null)
         {
@@ -23,7 +24,7 @@ public class UsersController(IMediator mediator) : ControllerBase
             request.Password
         );
 
-        var result = await mediator.Send(command);
+        var result = await mediator.Send(command, ct);
 
         return result.ToActionResult();
     }
@@ -42,6 +43,36 @@ public class UsersController(IMediator mediator) : ControllerBase
         );
 
         var result = await mediator.Send(command);
+
+        return result.ToActionResult();
+    }
+
+    [HttpPost("activate")]
+    public async Task<IActionResult> Activate([FromBody] ActivateUserRequestDTO request, CancellationToken ct)
+    {
+        if (request is null)
+        {
+            return BadRequest(new { message = "Invalid or empty JSON payload." });
+        }
+
+        var command = new ActivateUserCommand(request.Token, request.Password);
+
+        var result = await mediator.Send(command,ct);
+
+        return result.ToActionResult();
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDTO request, CancellationToken ct)
+    {
+        if (request is null)
+        {
+            return BadRequest(new { message = "Invalid or empty JSON payload." });
+        }
+
+        var command = new ForgotPasswordCommand(request.Email);
+
+        var result = await mediator.Send(command, ct);
 
         return result.ToActionResult();
     }

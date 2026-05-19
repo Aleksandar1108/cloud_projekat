@@ -2,9 +2,9 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SmartGrid.Application.Interfaces;
+using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Domain.Common;
 using SmartGrid.Domain.Enums;
-using SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories;
 
 namespace SmartGrid.Application.Features.Users.Command
 {
@@ -23,7 +23,7 @@ namespace SmartGrid.Application.Features.Users.Command
         {
             try
             {
-                var existing = await userRepository.GetByEmailAsync(request.Email);
+                var existing = await userRepository.GetByEmailAsync(request.Email, ct);
                 if (existing is null)
                     return Result<AuthResponse>.Failure("User does not exist", ErrorType.NotFound);
 

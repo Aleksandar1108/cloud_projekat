@@ -40,7 +40,11 @@ namespace SmartGrid.Domain.ValueObjects.User
             var bytes = Encoding.UTF8.GetBytes(raw);
             var hash = sha.ComputeHash(bytes);
 
-            var token = Convert.ToBase64String(hash);
+            //Replace mora da se uradi da zbog problema sa URL-om
+            var token = Convert.ToBase64String(hash)
+            .Replace("+", "-")
+            .Replace("/", "_")
+            .Replace("=", "");
 
             return new ActivationToken(token, createdAt);
         }
