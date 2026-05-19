@@ -61,4 +61,19 @@ public class UsersController(IMediator mediator) : ControllerBase
 
         return result.ToActionResult();
     }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDTO request, CancellationToken ct)
+    {
+        if (request is null)
+        {
+            return BadRequest(new { message = "Invalid or empty JSON payload." });
+        }
+
+        var command = new ForgotPasswordCommand(request.Email);
+
+        var result = await mediator.Send(command, ct);
+
+        return result.ToActionResult();
+    }
 }

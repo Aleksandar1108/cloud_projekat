@@ -39,6 +39,10 @@ namespace SmartGrid.Domain.Models
             ActivationStatus = ActivationStatus.Activated();
         }
 
+        public void Deactivate()
+        {
+            ActivationStatus = ActivationStatus.NotActivated();
+        }
         public static User Create(string email, string password)
         {
             return new User(
