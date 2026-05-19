@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { AuthAPIService } from "../../api_services/auth/AuthAPIService";
 import RegisterForm from "../../components/auth/RegisterForm";
+import UsersList from "../../components/auth/UsersList";
 
 type RegisterFormData = {
     email: string;
@@ -43,7 +44,7 @@ function UsersPage() {
             <h2>Register new user</h2>
             <RegisterForm handleSubmit={handleSubmit} onSubmit={onSubmit} register={register} errors={errors} watch={watch} setValue={setValue} />
             <h2>All users:</h2>
-            <p>#TODO dodati tabelarni prikaz svih korisnika</p>
+            <UsersList></UsersList>
         </div>
     );
 }

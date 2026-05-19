@@ -1,1 +1,7 @@
-export type UserRole = "user" | "moderator" | "admin" | "User" | "Admin" | "SysAdmin";
+export const ERoles = {
+    User: "User",
+    Admin: "Admin",
+    SysAdmin: "SysAdmin"
+} as const;
+
+export type ERoles = typeof ERoles[keyof typeof ERoles];

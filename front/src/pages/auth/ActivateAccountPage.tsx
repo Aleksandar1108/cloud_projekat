@@ -59,8 +59,7 @@ function ActivateAccountPage() {
             height: "100vh",
             gap: "16px"
         }}>
-            <h1>Activate Account</h1>
-
+            <h1>Smart Grid App</h1>
             {
                 !success && (
                     <>
@@ -111,7 +110,7 @@ function ActivateAccountPage() {
                             {
                                 loading
                                     ? "Activating..."
-                                    : "Activate Account"
+                                    : "Send"
                             }
                         </button>
                     </>

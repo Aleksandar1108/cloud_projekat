@@ -67,5 +67,73 @@
 
         </body>
         </html>";
+
+        public static string PasswordReset(string resetLink) => $@"
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <meta charset='UTF-8' />
+        <title>Reset your SmartGrid password</title>
+        </head>
+
+        <body style='margin:0;padding:0;background-color:#f4f6f8;font-family:Arial,Helvetica,sans-serif;'>
+
+        <table width='100%' cellpadding='0' cellspacing='0' style='padding:40px 0;background-color:#f4f6f8;'>
+        <tr>
+        <td align='center'>
+
+        <table width='600' cellpadding='0' cellspacing='0' style='background:#ffffff;border-radius:8px;padding:40px;'>
+
+        <tr>
+        <td align='center' style='padding-bottom:30px;'>
+            <h1 style='margin:0;color:#1f2937;'>SmartGrid Password Reset 🔒</h1>
+        </td>
+        </tr>
+
+        <tr>
+        <td style='color:#374151;font-size:16px;line-height:24px;padding-bottom:25px;'>
+            We received a request to reset your SmartGrid account password.<br/><br/>
+            To continue, click the button below and choose a new password.
+        </td>
+        </tr>
+
+        <tr>
+        <td align='center' style='padding:30px 0;'>
+            <a href='{resetLink}'
+                style='background-color:#2563eb;
+                        color:#ffffff;
+                        text-decoration:none;
+                        padding:14px 28px;
+                        border-radius:6px;
+                        display:inline-block;
+                        font-weight:bold;
+                        font-size:16px;'>
+                Reset Password
+            </a>
+        </td>
+        </tr>
+
+        <tr>
+        <td style='color:#6b7280;font-size:14px;line-height:22px;padding-top:20px;'>
+            This password reset link is valid for <b>30 minutes</b>.<br/><br/>
+            If you did not request a password reset, you can safely ignore this email and your password will remain unchanged.
+        </td>
+        </tr>
+
+        <tr>
+        <td style='padding-top:40px;color:#9ca3af;font-size:12px;text-align:center;'>
+            © {DateTime.UtcNow.Year} SmartGrid Team. All rights reserved.
+        </td>
+        </tr>
+
+        </table>
+
+        </td>
+        </tr>
+        </table>
+
+        </body>
+        </html>";
+
     }
 }

@@ -50,7 +50,7 @@ namespace SmartGrid.Application.Features.Users.Command
                 var frontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URL");
                 var link = $"{frontendUrl}activate?token={activation.Token.Value}";
 
-                await emailService.SendActivationEmailAsync(user.Email, "Reset your SmartGrid password", link, ct);
+                await emailService.SendPasswordResetEmailAsync(user.Email, "Reset your SmartGrid password", link, ct);
                 return Result<AuthResponse>.Success(new AuthResponse(token, DateTime.UtcNow.AddHours(2)));
 
             }
