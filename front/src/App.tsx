@@ -12,28 +12,31 @@ import PropertiesPage from './pages/properties/PropertiesPage'
 import PropertyDetailPage from './pages/properties/PropertyDetailPage'
 import ActivateAccountPage from './pages/auth/ActivateAccountPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
+import MainLayout from './layouts/MainLayout'
 
 function App() {
 
   return (
-  <>
-    <Routes>
-      <Route path='/' element={<DashboardPage />}></Route>
-      <Route path='/login' element = {<LoginPage />}></Route>
-      <Route path='/users' element = {<UsersPage />}></Route>
-      <Route path='/monthly-billing' element = {<MonthlyBillingPage />}></Route>
-      <Route path='/manual-readings' element = {<ManualReadingsPage />}></Route>
-      <Route path='/payment/success' element = {<PaymentSuccessPage />}></Route>
-      <Route path='/payment/cancel' element = {<PaymentCancelPage />}></Route>
-      <Route path='/properties' element = {<PropertiesPage />}></Route>
-      <Route path='/properties/:id' element = {<PropertyDetailPage />}></Route>
-      <Route path='/404' element = {<PageNotFound />}></Route>
-      <Route path="/activate" element={<ActivateAccountPage />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage  />}></Route>
-      <Route path="*" element={<Navigate to="/404" replace />} />
+    <>
+      <Routes>
+        <Route element={<MainLayout />}>
+          <Route path='/' element={<DashboardPage />}></Route>
+          <Route path='/users' element={<UsersPage />}></Route>
+          <Route path='/monthly-billing' element={<MonthlyBillingPage />}></Route>
+          <Route path='/manual-readings' element={<ManualReadingsPage />}></Route>
+          <Route path='/payment/success' element={<PaymentSuccessPage />}></Route>
+          <Route path='/payment/cancel' element={<PaymentCancelPage />}></Route>
+          <Route path='/properties' element={<PropertiesPage />}></Route>
+          <Route path='/properties/:id' element={<PropertyDetailPage />}></Route>
+          <Route path="*" element={<Navigate to="/404" replace />} />
 
-    </Routes>
-  </>
+        </Route>
+          <Route path='/login' element={<LoginPage />}></Route>
+          <Route path='/404' element={<PageNotFound />}></Route>
+          <Route path="/activate" element={<ActivateAccountPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />}></Route>
+      </Routes>
+    </>
   )
 
 }

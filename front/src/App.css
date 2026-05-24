@@ -1,32 +1,54 @@
 /* Color Palette */
 :root {
   /* Primary Colors */
-  --primary: #f7fff9;        /* Light green */
-  --secondary: #2e6eb6;      /* Blue */
+  --primary: #f7fff9;
+  /* Light green */
+  --secondary: #2e6eb6;
+  /* Blue */
 
   /* Blue Shades */
-  --blue-50: #f0f8ff;        /* Very light blue */
-  --blue-100: #e0f0fe;       /* Light blue */
-  --blue-200: #bae1fd;       /* Lighter blue */
-  --blue-300: #7cc8fc;       /* Light medium blue */
-  --blue-400: #36a9fb;       /* Medium light blue */
-  --blue-500: #2e6eb6;       /* Medium blue (secondary) */
-  --blue-600: #1e5a9a;       /* Medium dark blue */
-  --blue-700: #1a4a7e;       /* Dark blue */
-  --blue-800: #153662;       /* Darker blue */
-  --blue-900: #0f2246;       /* Very dark blue */
+  --blue-50: #f0f8ff;
+  /* Very light blue */
+  --blue-100: #e0f0fe;
+  /* Light blue */
+  --blue-200: #bae1fd;
+  /* Lighter blue */
+  --blue-300: #7cc8fc;
+  /* Light medium blue */
+  --blue-400: #36a9fb;
+  /* Medium light blue */
+  --blue-500: #2e6eb6;
+  /* Medium blue (secondary) */
+  --blue-600: #1e5a9a;
+  /* Medium dark blue */
+  --blue-700: #1a4a7e;
+  /* Dark blue */
+  --blue-800: #153662;
+  /* Darker blue */
+  --blue-900: #0f2246;
+  /* Very dark blue */
 
   /* Soft Red Shades */
-  --red-50: #fef2f2;         /* Very light red */
-  --red-100: #fee2e2;        /* Light red */
-  --red-200: #fecaca;        /* Lighter red */
-  --red-300: #fca5a5;        /* Light medium red */
-  --red-400: #f87171;        /* Medium light red */
-  --red-500: #ef4444;        /* Medium red */
-  --red-600: #dc2626;        /* Medium dark red */
-  --red-700: #b91c1c;        /* Dark red */
-  --red-800: #991b1b;        /* Darker red */
-  --red-900: #7f1d1d;        /* Very dark red */
+  --red-50: #fef2f2;
+  /* Very light red */
+  --red-100: #fee2e2;
+  /* Light red */
+  --red-200: #fecaca;
+  /* Lighter red */
+  --red-300: #fca5a5;
+  /* Light medium red */
+  --red-400: #f87171;
+  /* Medium light red */
+  --red-500: #ef4444;
+  /* Medium red */
+  --red-600: #dc2626;
+  /* Medium dark red */
+  --red-700: #b91c1c;
+  /* Dark red */
+  --red-800: #991b1b;
+  /* Darker red */
+  --red-900: #7f1d1d;
+  /* Very dark red */
 
   /* Neutral Colors */
   --white: #ffffff;
@@ -51,6 +73,13 @@ body {
   padding: 0;
 }
 
+main {
+  display: "flex";
+  justifyContent: "center";
+  alignItems: "center";
+  minHeight: "100vh";
+}
+
 body {
   background-color: var(--primary);
   display: flex;
@@ -61,7 +90,23 @@ body {
 }
 
 /* Text Elements */
-h1, h2, h3, h4, h5, h6, p, span, div, a, li, td, th, label, input, textarea, select, button {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+div,
+a,
+li,
+td,
+th,
+label,
+input,
+textarea,
+select,
+button {
   color: var(--gray-900);
 }
-

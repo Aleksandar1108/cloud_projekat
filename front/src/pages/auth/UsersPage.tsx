@@ -64,13 +64,13 @@ function UsersPage() {
     }
 
     return (
-        <div >
+        <main >
             <h1>Users</h1>
             <h2>Register new user</h2>
             <RegisterForm handleSubmit={handleSubmit} onSubmit={onSubmit} register={register} errors={errors} watch={watch} setValue={setValue} />
             <h2>All users:</h2>
             <UsersList users={users} setUsers={setUsers}></UsersList>
-        </div>
+        </main>
     );
 }
 

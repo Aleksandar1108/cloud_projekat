@@ -30,10 +30,15 @@ function LoginPage() {
     }
 
     return (
-        <div >
+        <main style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "100vh",
+        }}>
             <h2>Login Form</h2>
             <LoginForm handleSubmit={handleSubmit} onSubmit={onSubmit} register={register} errors={errors} />
-        </div>
+        </main>
     );
 }
 

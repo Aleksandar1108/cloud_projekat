@@ -1,4 +1,5 @@
 import LoginButton from "../../components/auth/LoginButton";
+import DrawerAppBar from "../../components/nav/DrawerAppBar";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { useNavigate } from "react-router-dom";
 
@@ -8,6 +9,7 @@ function DashboardPage(){
 
     return (
         <main>
+            <DrawerAppBar />
             <h1>Dashboard Page</h1>
             <LoginButton />
             {isAuthenticated && (
