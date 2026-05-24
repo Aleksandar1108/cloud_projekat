@@ -8,7 +8,7 @@ namespace SmartGrid.Domain.Models
         public UserId Id { get; set; }
         public Email Email { get; set; }
 
-        public UserRole Role { get; set; }
+        public UserRole Role { get; private set; }
         public PasswordHash Password { get; set; }
 
         public DateTime AccountCreated { get; set; }
@@ -43,6 +43,12 @@ namespace SmartGrid.Domain.Models
         {
             ActivationStatus = ActivationStatus.NotActivated();
         }
+
+        public void ChangeRole(UserRole role)
+        {
+            Role = role;
+        }
+
         public static User Create(string email, string password)
         {
             return new User(

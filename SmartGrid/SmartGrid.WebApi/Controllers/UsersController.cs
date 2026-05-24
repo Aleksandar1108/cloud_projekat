@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SmartGrid.Application.Features.Users.Command;
+using SmartGrid.Application.Features.Users.Queries;
 using SmartGrid.WebApi.DTOs;
 using SmartGrid.WebApi.Extensions;
 using System.Linq;
@@ -71,6 +72,43 @@ public class UsersController(IMediator mediator) : ControllerBase
         }
 
         var command = new ForgotPasswordCommand(request.Email);
+
+        var result = await mediator.Send(command, ct);
+
+        return result.ToActionResult();
+    }
+
+    [HttpGet("")]
+    public async Task<IActionResult> GetUsers(CancellationToken ct)
+    {
+        var command = new GetUsersQuery();
+
+        var result = await mediator.Send(command, ct);
+
+        return result.ToActionResult();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteUser(
+    [FromRoute] string id,
+    CancellationToken ct)
+    {
+        var command = new DeleteUserCommand(id);
+
+        var result = await mediator.Send(command, ct);
+
+        return result.ToActionResult();
+    }
+
+    [HttpPatch("{userID}/role")]
+    public async Task<IActionResult> ChangeRole([FromRoute] string userId,[FromBody] ChangeRoleRequestDTO request, CancellationToken ct)
+    {
+        if (request is null)
+        {
+            return BadRequest(new { message = "Invalid or empty JSON payload." });
+        }
+
+        var command = new ChangeUserRoleCommand(userId, request.NewRole);
 
         var result = await mediator.Send(command, ct);
 

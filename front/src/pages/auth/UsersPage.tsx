@@ -4,6 +4,8 @@ import { useAuth } from "../../hooks/auth/useAuthHook";
 import { AuthAPIService } from "../../api_services/auth/AuthAPIService";
 import RegisterForm from "../../components/auth/RegisterForm";
 import UsersList from "../../components/auth/UsersList";
+import type { UserDTO } from "../../models/auth/UserDTO";
+import { useEffect, useState } from "react";
 
 type RegisterFormData = {
     email: string;
@@ -22,11 +24,34 @@ function UsersPage() {
         formState: { errors },
     } = useForm<RegisterFormData>();
 
+    const [users, setUsers] = useState<UserDTO[]>([]);
+
+    const loadUsers = async () => {
+
+        const response = await AuthAPIService.getUsers();
+
+        setUsers(response);
+    };
+
+    useEffect(() => {
+
+        const fetchUsers = async () => {
+
+            const response = await AuthAPIService.getUsers();
+
+            setUsers(response);
+        };
+
+        fetchUsers();
+
+    }, []);
+
     const onSubmit: SubmitHandler<RegisterFormData> = async (data) => {
         const response = await AuthAPIService.register(data.email, data.password);
 
         if (response.token) {
             alert("User registered successfully!");
+            await loadUsers();
         } else {
             alert("Registration failed: " + (response.error || response.message));
         }
@@ -44,7 +69,7 @@ function UsersPage() {
             <h2>Register new user</h2>
             <RegisterForm handleSubmit={handleSubmit} onSubmit={onSubmit} register={register} errors={errors} watch={watch} setValue={setValue} />
             <h2>All users:</h2>
-            <UsersList></UsersList>
+            <UsersList users={users} setUsers={setUsers}></UsersList>
         </div>
     );
 }

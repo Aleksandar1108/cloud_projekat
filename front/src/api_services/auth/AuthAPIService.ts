@@ -2,9 +2,9 @@ import axios from "axios";
 import type { AuthResponse } from "../../types/auth/AuthResponse";
 import type { IAuthAPIService } from "./IAuthAPIService";
 import { buildApiUrl } from "../ApiBase";
+import type { UserDTO } from "../../models/auth/UserDTO";
 
 export const AuthAPIService: IAuthAPIService = {
-
     async login(email: string, password: string): Promise<AuthResponse> {
         try {
             const res = await axios.post<AuthResponse>(
@@ -25,11 +25,10 @@ export const AuthAPIService: IAuthAPIService = {
         catch (error) {
             const err: AuthResponse = {};
             if (axios.isAxiosError(error) && error.response) {
-                const data: any = error.response.data;
+                const data: AuthResponse = error.response.data;
                 err.error =
                     data?.message ||
                     data?.error ||
-                    data?.type ||
                     "Unknown error";
             } else {
                 err.error = "Server error";
@@ -49,12 +48,10 @@ export const AuthAPIService: IAuthAPIService = {
         }
         catch (error) {
             if (axios.isAxiosError(error) && error.response) {
-                const data: any = error.response.data;
+                const data: AuthResponse = error.response.data;
 
                 return {
-                    error:
-                        data.message ||
-                        data.type ||
+                    error: data.message ||
                         "Unknown error"
                 };
             }
@@ -74,12 +71,10 @@ export const AuthAPIService: IAuthAPIService = {
         }
         catch (error) {
             if (axios.isAxiosError(error) && error.response) {
-                const data: any = error.response.data;
+                const data: AuthResponse = error.response.data;
 
                 return {
-                    error:
-                        data.message ||
-                        data.type ||
+                    error: data.message ||
                         "Unknown error"
                 };
             }
@@ -101,8 +96,7 @@ export const AuthAPIService: IAuthAPIService = {
                 const data = error.response.data;
 
                 return {
-                    error:
-                        data.message ||
+                    error: data.message ||
                         data.type ||
                         "Unknown error"
                 };
@@ -113,5 +107,74 @@ export const AuthAPIService: IAuthAPIService = {
             };
         }
 
+    },
+
+    async changeUserRole(userId: string, newRole: string): Promise<AuthResponse> {
+        try {
+            return await axios.patch<AuthResponse>(
+                buildApiUrl(`users/${userId}/role`),
+                { newRole }
+            ).then(res => res.data);
+        }
+        catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
+                const data = error.response.data;
+
+                return {
+                    error: data.message ||
+                        data.type ||
+                        "Unknown error"
+                };
+            }
+
+            return {
+                error: "Server error"
+            };
+        }
+    },
+
+    async deleteUser(userId: string): Promise<AuthResponse> {
+        try {
+            return await axios.delete<AuthResponse>(
+                buildApiUrl(`users/${userId}`)
+            ).then(res => res.data);
+        }
+        catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
+                const data = error.response.data;
+
+                return {
+                    error: data.message ||
+                        data.type ||
+                        "Unknown error"
+                };
+            }
+
+            return {
+                error: "Server error"
+            };
+        }
+    },
+    async getUsers(): Promise<UserDTO[]> {
+
+        try {
+
+            const res = await axios.get<UserDTO[]>(buildApiUrl("users"));
+
+            return res.data;
+        }
+        catch (error) {
+
+            if (axios.isAxiosError(error) && error.response) {
+
+                console.error(error.response.data);
+            }
+            else {
+
+                console.error("Server error");
+            }
+
+            return [];
+        }
     }
-}
+};

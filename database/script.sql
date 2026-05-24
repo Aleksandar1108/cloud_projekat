@@ -19,7 +19,12 @@ CREATE TABLE EmailActivation (
   createdAt DATETIME NOT NULL,
   expireAt DATETIME NOT NULL,
   PRIMARY KEY (idEmailActivation),
-  FOREIGN KEY (idUsers) REFERENCES Users(idUsers));
+  
+  CONSTRAINT FK_EmailActivation_Users
+  FOREIGN KEY (idUsers)
+  REFERENCES Users(idUsers)
+  ON DELETE CASCADE
+  );
   
 CREATE TABLE TariffModels (
   id INT IDENTITY(1,1) PRIMARY KEY,
@@ -37,6 +42,7 @@ CREATE TABLE TariffModels (
   approvedPowerKw FLOAT NOT NULL
 );
 
+-- Razmotritii dodavanje kaskadnog brisanja (pogotovo zbog user-a)
 CREATE TABLE Properties (
   Id UNIQUEIDENTIFIER NOT NULL,
   UserId UNIQUEIDENTIFIER NOT NULL,
