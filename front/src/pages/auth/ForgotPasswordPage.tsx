@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthAPIService } from "../../api_services/auth/AuthAPIService";
-import LoginButton from "../../components/auth/LoginButton";
 
 function ForgotPasswordPage() {
 

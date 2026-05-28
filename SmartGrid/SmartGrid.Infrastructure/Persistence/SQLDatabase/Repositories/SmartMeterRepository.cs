@@ -46,6 +46,15 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories
             return entity is null ? null : _mapper.ToDomain(entity);
         }
 
+        public async Task<SmartMeter?> GetByDeviceUuidAsync(string deviceUuid, CancellationToken ct = default)
+        {
+            var entity = await _context.SmartMeters
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.DeviceUUID == deviceUuid, ct);
+
+            return entity is null ? null : _mapper.ToDomain(entity);
+        }
+
         public async Task AddAsync(SmartMeter smartMeter, CancellationToken ct = default)
         {
             var entity = _mapper.ToEntity(smartMeter);
