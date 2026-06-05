@@ -2,6 +2,7 @@ import axios from "axios";
 import { buildApiUrl } from "../ApiBase";
 import type { Property, CreatePropertyDto, UpdatePropertyDto } from "../../types/property/Property";
 import type { SmartMeter, AddSmartMeterDto, UpdateSmartMeterDto } from "../../types/property/SmartMeter";
+import type { ConsumptionLimit, SetConsumptionLimitDto } from "../../types/consumption/ConsumptionLimit";
 import { ReadValueByKey } from "../../helpers/local_storage";
 
 function authHeaders() {
@@ -89,6 +90,35 @@ export async function registerSerialNumber(propertyId: string, meterId: string, 
     await axios.post(
         buildApiUrl(`api/properties/${propertyId}/smart-meters/${meterId}/register-serial`),
         { serialNumber },
+        { headers: authHeaders() }
+    );
+}
+
+// ── Consumption Limits ───────────────────────────────────────────────────────
+
+export async function getConsumptionLimit(propertyId: string, meterId: string): Promise<ConsumptionLimit | null> {
+    const response = await axios.get<ConsumptionLimit | null>(
+        buildApiUrl(`api/properties/${propertyId}/smart-meters/${meterId}/consumption-limit`),
+        { headers: authHeaders() }
+    );
+    return response.data;
+}
+
+export async function setConsumptionLimit(
+    propertyId: string,
+    meterId: string,
+    dto: SetConsumptionLimitDto
+): Promise<void> {
+    await axios.put(
+        buildApiUrl(`api/properties/${propertyId}/smart-meters/${meterId}/consumption-limit`),
+        dto,
+        { headers: authHeaders() }
+    );
+}
+
+export async function deleteConsumptionLimit(propertyId: string, meterId: string): Promise<void> {
+    await axios.delete(
+        buildApiUrl(`api/properties/${propertyId}/smart-meters/${meterId}/consumption-limit`),
         { headers: authHeaders() }
     );
 }

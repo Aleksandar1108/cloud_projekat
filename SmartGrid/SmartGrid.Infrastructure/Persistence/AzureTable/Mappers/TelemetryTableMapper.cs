@@ -17,7 +17,8 @@ namespace SmartGrid.Infrastructure.Persistence.AzureTable.Mappers
                 DeviceType = domain.DeviceType.ToString(),
                 CurrentPower = domain.CurrentPower.Value,
                 NominalPower = domain.NominalPower.Value,
-                FirmwareVersion = domain.FirmwareVersion.Value
+                FirmwareVersion = domain.FirmwareVersion.Value,
+                Voltage = domain.Voltage
             };
         }
 
@@ -38,7 +39,8 @@ namespace SmartGrid.Infrastructure.Persistence.AzureTable.Mappers
                 entity.NominalPower,
                 entity.CurrentPower,
                 entity.ObservationTime,
-                entity.FirmwareVersion
+                entity.FirmwareVersion,
+                entity.Voltage
             );
 
             if (telemetryResult.IsFailure)

@@ -15,6 +15,7 @@ namespace SmartGrid.Domain.Models
         public Power CurrentPower { get; private set; }
         public DateTime Timestamp { get; private set; }
         public Percentage LoadPercentage { get; private set; }
+        public double? Voltage { get; private set; }
 
         private Telemetry(
             EntityId id,
@@ -24,7 +25,8 @@ namespace SmartGrid.Domain.Models
             Power nominalPower,
             Power currentPower,
             DateTime timestamp,
-            FirmwareVersion firmwareVersion)
+            FirmwareVersion firmwareVersion,
+            double? voltage)
         {
             Id = id;
             DeviceId = deviceId;
@@ -34,6 +36,7 @@ namespace SmartGrid.Domain.Models
             CurrentPower = currentPower;
             Timestamp = timestamp;
             FirmwareVersion = firmwareVersion;
+            Voltage = voltage;
             LoadPercentage = nominalPower.Value > 0
                 ? Percentage.FromRaw(Math.Round((currentPower.Value / nominalPower.Value) * 100, 2))
                 : Percentage.Zero();
@@ -48,7 +51,8 @@ namespace SmartGrid.Domain.Models
             double nominalPower,
             double currentPower,
             DateTime timestamp,
-            string firmwareVersion)
+            string firmwareVersion,
+            double? voltage = null)
         {
             if (string.IsNullOrWhiteSpace(deviceName))
                 return Result<Telemetry>.Failure("DeviceName is required.",
@@ -83,6 +87,9 @@ namespace SmartGrid.Domain.Models
             if (firmwareVersionResult.IsFailure)
                 return Result<Telemetry>.Failure(firmwareVersionResult.Error!.Message, ErrorType.Validation);
 
+            if (voltage is < 0)
+                return Result<Telemetry>.Failure("Voltage cannot be negative.", ErrorType.Validation);
+
             return Result<Telemetry>.Success(new Telemetry(
                 EntityId.New(),
                 idResult.Value,
@@ -91,7 +98,8 @@ namespace SmartGrid.Domain.Models
                 nominalPowerResult.Value,
                 currentPowerResult.Value,
                 timestamp,
-                firmwareVersionResult.Value
+                firmwareVersionResult.Value,
+                voltage
             ));
         }
         public static Result<Telemetry> Load(
@@ -102,7 +110,8 @@ namespace SmartGrid.Domain.Models
             double nominalPower,
             double currentPower,
             DateTime timestamp,
-            string firmwareVersion)
+            string firmwareVersion,
+            double? voltage = null)
         {
             var idResult = EntityId.Create(id);
             if (idResult.IsFailure)
@@ -132,7 +141,8 @@ namespace SmartGrid.Domain.Models
                 nominalPowerResult.Value,
                 currentPowerResult.Value,
                 timestamp,
-                firmwareResult.Value);
+                firmwareResult.Value,
+                voltage);
 
             return Result<Telemetry>.Success(telemetry);
         }

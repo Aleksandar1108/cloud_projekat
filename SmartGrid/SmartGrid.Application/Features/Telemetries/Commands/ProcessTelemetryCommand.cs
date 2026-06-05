@@ -20,6 +20,7 @@ namespace SmartGrid.Application.Features.Telemetries.Commands
         public double CurrentPower { get; init; }
         public string FirmwareVersion { get; init; } = string.Empty;
         public DateTime Timestamp { get; init; }
+        public double? Voltage { get; init; }
     }
 
     // VALIDATOR
@@ -68,7 +69,8 @@ namespace SmartGrid.Application.Features.Telemetries.Commands
                 request.NominalPower,
                 request.CurrentPower,
                 request.Timestamp,
-                request.FirmwareVersion
+                request.FirmwareVersion,
+                request.Voltage
             );
 
             if (telemetryResult.IsFailure)

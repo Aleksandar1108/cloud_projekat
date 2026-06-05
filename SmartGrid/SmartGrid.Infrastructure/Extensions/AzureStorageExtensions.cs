@@ -55,6 +55,9 @@ namespace SmartGrid.Infrastructure.Extensions
             services.AddScoped<IManualReadingRepository, ManualReadingRepository>();
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IStripeEventRepository, StripeEventRepository>();
+            services.AddScoped<IConsumptionLimitRepository, ConsumptionLimitRepository>();
+            services.AddScoped<IConsumptionLimitNotifiedRepository, ConsumptionLimitNotifiedRepository>();
+            services.AddScoped<IAlertDispatchStateRepository, AlertDispatchStateRepository>();
 
             return services;
         }
