@@ -5,6 +5,7 @@ using SmartGrid.Application.Features.Properties.Commands;
 using SmartGrid.Application.Features.Properties.Queries;
 using SmartGrid.Application.Features.SmartMeters.Commands;
 using SmartGrid.Application.Features.SmartMeters.Queries;
+using SmartGrid.Application.Features.Telemetries.Queries;
 using SmartGrid.WebApi.DTOs;
 using SmartGrid.WebApi.Extensions;
 
@@ -127,6 +128,16 @@ public class PropertiesController(IMediator mediator) : ControllerBase
 
         var command = new RegisterSerialNumberCommand(meterId, propertyId, userId.Value, request.SerialNumber);
         var result = await mediator.Send(command);
+        return result.ToActionResult();
+    }
+
+    [HttpGet("{propertyId:guid}/telemetry-analytics")]
+    public async Task<IActionResult> GetTelemetryAnalytics(Guid propertyId)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Unauthorized();
+
+        var result = await mediator.Send(new GetPropertyTelemetryAnalyticsQuery(propertyId, userId.Value));
         return result.ToActionResult();
     }
 }

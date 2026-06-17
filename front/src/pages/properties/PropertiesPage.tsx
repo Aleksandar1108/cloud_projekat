@@ -86,6 +86,9 @@ function PropertiesPage() {
             <button onClick={() => navigate("/")} style={btnSecondary}>
                 ← Nazad na Dashboard
             </button>
+            <button onClick={() => navigate("/telemetry-analytics")} style={{ ...btnPrimary, marginLeft: "8px" }}>
+                Telemetrija i analitika
+            </button>
 
             {error && <p style={{ color: "red", marginTop: "12px" }}>{error}</p>}
 
