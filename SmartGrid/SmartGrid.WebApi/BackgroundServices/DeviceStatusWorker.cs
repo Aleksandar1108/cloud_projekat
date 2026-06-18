@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR;
 using SmartGrid.Application.Features.DeviceStatuses.Queries;
 using SmartGrid.Application.Interfaces;
 using SmartGrid.Application.Interfaces.Messaging;
+using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Domain.Models;
 using SmartGrid.WebApi.Hubs;
 
@@ -26,6 +27,7 @@ namespace SmartGrid.WebApi.BackgroundServices
                     using var scope = serviceProvider.CreateScope();
 
                     var queueService = scope.ServiceProvider.GetRequiredService<IDeviceStatusQueueService>();
+                    var smartMeterRepository = scope.ServiceProvider.GetRequiredService<ISmartMeterRepository>();
 
                     var message = await queueService.ReceiveStatusUpdateAsync(stoppingToken);
 
@@ -42,6 +44,14 @@ namespace SmartGrid.WebApi.BackgroundServices
                         await hubContext.Clients.All.SendAsync("ReceiveStatusUpdate",
                                                                deviceStatusDto,
                                                                stoppingToken);
+
+                        var linkedMeter = await smartMeterRepository.GetByDeviceUuidAsync(deviceStatus.DeviceId.Value, stoppingToken);
+                        if (linkedMeter is not null)
+                        {
+                            await hubContext.Clients
+                                .Group(DeviceHubGroups.Property(linkedMeter.PropertyId.ToString()))
+                                .SendAsync("ReceivePropertyStatusUpdate", deviceStatusDto, stoppingToken);
+                        }
 
                         await message.CompleteAsync();
 

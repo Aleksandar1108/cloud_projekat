@@ -16,50 +16,66 @@ function DashboardPage(){
                 <section style={{ marginTop: "24px", maxWidth: "920px" }}>
                     <h2>Automatizovani mesecni obracun</h2>
                     <p>Ulogovani korisnik: {user?.username}</p>
-                    <button
-                        onClick={() => navigate("/monthly-billing")}
-                        style={{
-                            backgroundColor: "var(--secondary)",
-                            color: "var(--white)",
-                            border: "none",
-                            padding: "10px 16px",
-                            borderRadius: "6px",
-                            cursor: "pointer",
-                            fontWeight: "bold"
-                        }}
-                    >
-                        Otvori obracun
-                    </button>
-                    <button
-                        onClick={() => navigate("/manual-readings")}
-                        style={{
-                            backgroundColor: "#0f766e",
-                            color: "var(--white)",
-                            border: "none",
-                            padding: "10px 16px",
-                            borderRadius: "6px",
-                            cursor: "pointer",
-                            fontWeight: "bold",
-                            marginLeft: "8px"
-                        }}
-                    >
-                        Rucni unos potrosnje
-                    </button>
-                    <button
-                        onClick={() => navigate("/properties")}
-                        style={{
-                            backgroundColor: "#7c3aed",
-                            color: "var(--white)",
-                            border: "none",
-                            padding: "10px 16px",
-                            borderRadius: "6px",
-                            cursor: "pointer",
-                            fontWeight: "bold",
-                            marginLeft: "8px"
-                        }}
-                    >
-                        Moji objekti
-                    </button>
+                    <div style={{ display: "inline-grid", gridTemplateColumns: "repeat(3, auto)", gap: "8px", alignItems: "stretch" }}>
+                        <button
+                            onClick={() => navigate("/monthly-billing")}
+                            style={{
+                                backgroundColor: "var(--secondary)",
+                                color: "var(--white)",
+                                border: "none",
+                                padding: "10px 16px",
+                                borderRadius: "6px",
+                                cursor: "pointer",
+                                fontWeight: "bold"
+                            }}
+                        >
+                            Otvori obracun
+                        </button>
+                        <button
+                            onClick={() => navigate("/manual-readings")}
+                            style={{
+                                backgroundColor: "#0f766e",
+                                color: "var(--white)",
+                                border: "none",
+                                padding: "10px 16px",
+                                borderRadius: "6px",
+                                cursor: "pointer",
+                                fontWeight: "bold"
+                            }}
+                        >
+                            Rucni unos potrosnje
+                        </button>
+                        <button
+                            onClick={() => navigate("/properties")}
+                            style={{
+                                backgroundColor: "#7c3aed",
+                                color: "var(--white)",
+                                border: "none",
+                                padding: "10px 16px",
+                                borderRadius: "6px",
+                                cursor: "pointer",
+                                fontWeight: "bold"
+                            }}
+                        >
+                            Moji objekti
+                        </button>
+                        <button
+                            onClick={() => navigate("/telemetry-analytics")}
+                            style={{
+                                gridColumn: "1 / 4",
+                                width: "100%",
+                                backgroundColor: "#1d4ed8",
+                                color: "var(--white)",
+                                border: "none",
+                                padding: "10px 16px",
+                                borderRadius: "6px",
+                                cursor: "pointer",
+                                fontWeight: "bold"
+                            }}
+                        >
+                            Telemetrija i analitika
+                        </button>
+                    </div>
                 </section>
             )}
         </main>

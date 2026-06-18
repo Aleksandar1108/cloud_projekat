@@ -13,6 +13,7 @@ import PropertyDetailPage from './pages/properties/PropertyDetailPage'
 import ActivateAccountPage from './pages/auth/ActivateAccountPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
 import MainLayout from './layouts/MainLayout'
+import TelemetryAnalyticsPage from './pages/telemetry/TelemetryAnalyticsPage'
 
 function App() {
 
@@ -28,6 +29,7 @@ function App() {
           <Route path='/payment/cancel' element={<PaymentCancelPage />}></Route>
           <Route path='/properties' element={<PropertiesPage />}></Route>
           <Route path='/properties/:id' element={<PropertyDetailPage />}></Route>
+          <Route path='/telemetry-analytics' element={<TelemetryAnalyticsPage />}></Route>
           <Route path="*" element={<Navigate to="/404" replace />} />
 
         </Route>
