@@ -6,7 +6,6 @@ namespace SmartGrid.Application.Interfaces.Repositories
     {
         Task<IReadOnlyCollection<SmartMeter>> GetByPropertyIdAsync(Guid propertyId, CancellationToken ct = default);
         Task<SmartMeter?> GetByIdAsync(Guid id, CancellationToken ct = default);
-        Task<SmartMeter?> GetByDeviceUuidAsync(string deviceUuid, CancellationToken ct = default);
         Task<SmartMeter?> GetBySerialNumberAsync(string serialNumber, CancellationToken ct = default);
         Task<SmartMeter?> GetByDeviceUUIDAsync(string deviceUUID, CancellationToken ct = default);
         Task<IReadOnlyCollection<SmartMeter>> GetAllPairedAsync(CancellationToken ct = default);

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { buildApiUrl } from "../ApiBase";
+import { buildApiUrl, buildFunctionsUrl } from "../ApiBase";
 import type { Property, CreatePropertyDto, UpdatePropertyDto } from "../../types/property/Property";
 import type { SmartMeter, AddSmartMeterDto, UpdateSmartMeterDto } from "../../types/property/SmartMeter";
 import type { ConsumptionLimit, SetConsumptionLimitDto } from "../../types/consumption/ConsumptionLimit";
@@ -92,6 +92,14 @@ export async function registerSerialNumber(propertyId: string, meterId: string, 
         { serialNumber },
         { headers: authHeaders() }
     );
+}
+
+export async function activateSmartMeter(serialNumber: string, deviceUUID: string): Promise<string> {
+    const response = await axios.post<{ data: string }>(
+        buildFunctionsUrl("api/ActivateSmartMeter"),
+        { serialNumber, deviceUUID }
+    );
+    return response.data.data;
 }
 
 // ── Consumption Limits ───────────────────────────────────────────────────────
