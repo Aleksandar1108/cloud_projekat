@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SmartGrid.Application.Interfaces.Repositories;
+using SmartGrid.Domain.Enums;
 using SmartGrid.Domain.Models;
 using SmartGrid.Infrastructure.Persistence.SQLDatabase.Common;
 using SmartGrid.Infrastructure.Persistence.SQLDatabase.Entities;
@@ -46,13 +47,24 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories
             return entity is null ? null : _mapper.ToDomain(entity);
         }
 
-        public async Task<SmartMeter?> GetByDeviceUuidAsync(string deviceUuid, CancellationToken ct = default)
+        public async Task<SmartMeter?> GetByDeviceUUIDAsync(string deviceUUID, CancellationToken ct = default)
         {
             var entity = await _context.SmartMeters
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.DeviceUUID == deviceUuid, ct);
+                .FirstOrDefaultAsync(x => x.DeviceUUID == deviceUUID, ct);
 
             return entity is null ? null : _mapper.ToDomain(entity);
+        }
+
+        public async Task<IReadOnlyCollection<SmartMeter>> GetAllPairedAsync(CancellationToken ct = default)
+        {
+            var pairedStatus = PairingStatus.Paired.ToString();
+            var entities = await _context.SmartMeters
+                .AsNoTracking()
+                .Where(x => x.PairingStatus == pairedStatus && x.DeviceUUID != null)
+                .ToListAsync(ct);
+
+            return entities.Select(_mapper.ToDomain).Where(x => x is not null).Select(x => x!).ToList();
         }
 
         public async Task AddAsync(SmartMeter smartMeter, CancellationToken ct = default)

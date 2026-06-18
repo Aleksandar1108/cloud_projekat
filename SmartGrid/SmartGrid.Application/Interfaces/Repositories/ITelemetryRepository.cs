@@ -9,5 +9,11 @@ namespace SmartGrid.Application.Interfaces.Repositories
             DateTime periodStartUtc,
             DateTime periodEndUtc,
             CancellationToken ct = default);
+        Task<IReadOnlyCollection<Telemetry>> GetByDeviceAndPeriodAsync(
+            string deviceId,
+            DateTime periodStartUtc,
+            DateTime periodEndUtc,
+            CancellationToken ct = default);
+        Task<Telemetry?> GetLatestByDeviceIdAsync(string deviceId, CancellationToken ct = default);
     }
 }

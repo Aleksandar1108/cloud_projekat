@@ -11,5 +11,8 @@
         public string ManualReadingsTable { get; init; } = string.Empty;
         public string PaymentsTable { get; init; } = string.Empty;
         public string StripeEventsTable { get; init; } = string.Empty;
+        public string ConsumptionLimitsTable { get; init; } = string.Empty;
+        public string ConsumptionLimitNotifiedTable { get; init; } = string.Empty;
+        public string AlertDispatchStateTable { get; init; } = string.Empty;
     }
 }

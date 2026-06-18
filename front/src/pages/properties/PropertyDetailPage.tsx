@@ -8,10 +8,14 @@ import {
     addSmartMeter,
     updateSmartMeter,
     deleteSmartMeter,
-    registerSerialNumber
+    registerSerialNumber,
+    getConsumptionLimit,
+    setConsumptionLimit,
+    deleteConsumptionLimit
 } from "../../api_services/properties/PropertyAPIService";
 import type { Property, UpdatePropertyDto, PropertyType } from "../../types/property/Property";
 import type { SmartMeter, AddSmartMeterDto, ConnectionType } from "../../types/property/SmartMeter";
+import type { ConsumptionLimitUnit } from "../../types/consumption/ConsumptionLimit";
 
 const PROPERTY_TYPES: PropertyType[] = ["Stan", "Kuca", "Vikendica"];
 const PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {
@@ -46,6 +50,9 @@ function PropertyDetailPage() {
     const [serialForms, setSerialForms] = useState<Record<string, string>>({});
     const [serialSubmitting, setSerialSubmitting] = useState<string | null>(null);
 
+    const [limitForms, setLimitForms] = useState<Record<string, { unit: ConsumptionLimitUnit; limitValue: string }>>({});
+    const [limitSubmitting, setLimitSubmitting] = useState<string | null>(null);
+
     useEffect(() => {
         if (!isAuthenticated) { navigate("/login"); return; }
         if (!id) return;
@@ -62,6 +69,22 @@ function PropertyDetailPage() {
             setProperty(prop);
             setMeters(meterList);
             setEditForm({ name: prop.name, city: prop.city, address: prop.address, description: prop.description, propertyType: prop.propertyType });
+
+            const limits = await Promise.all(
+                meterList.map(async (meter) => ({
+                    meterId: meter.id,
+                    limit: await getConsumptionLimit(id!, meter.id).catch(() => null)
+                }))
+            );
+
+            const initialLimitForms: Record<string, { unit: ConsumptionLimitUnit; limitValue: string }> = {};
+            for (const entry of limits) {
+                initialLimitForms[entry.meterId] = {
+                    unit: entry.limit?.unit ?? "Kwh",
+                    limitValue: entry.limit ? String(entry.limit.limitValue) : ""
+                };
+            }
+            setLimitForms(initialLimitForms);
         } catch {
             setError("Greška pri učitavanju podataka.");
         } finally {
@@ -140,6 +163,40 @@ function PropertyDetailPage() {
             setError(msg ?? "Greška pri registraciji serijskog broja.");
         } finally {
             setSerialSubmitting(null);
+        }
+    }
+
+    async function handleSaveLimit(meterId: string) {
+        const form = limitForms[meterId];
+        const value = Number(form?.limitValue);
+        if (!form || !Number.isFinite(value) || value <= 0) {
+            setError("Unesite validan limit potrošnje veći od nule.");
+            return;
+        }
+
+        setLimitSubmitting(meterId);
+        setError(null);
+        try {
+            await setConsumptionLimit(id!, meterId, { unit: form.unit, limitValue: value });
+            showSuccess("Limit potrošnje je sačuvan.");
+        } catch {
+            setError("Greška pri čuvanju limita potrošnje.");
+        } finally {
+            setLimitSubmitting(null);
+        }
+    }
+
+    async function handleClearLimit(meterId: string) {
+        setLimitSubmitting(meterId);
+        setError(null);
+        try {
+            await deleteConsumptionLimit(id!, meterId);
+            setLimitForms(prev => ({ ...prev, [meterId]: { unit: "Kwh", limitValue: "" } }));
+            showSuccess("Limit potrošnje je uklonjen.");
+        } catch {
+            setError("Greška pri uklanjanju limita potrošnje.");
+        } finally {
+            setLimitSubmitting(null);
         }
     }
 
@@ -298,6 +355,57 @@ function PropertyDetailPage() {
                                                 </div>
                                             </div>
                                         )}
+
+                                        <div style={{ marginTop: "12px", paddingTop: "12px", borderTop: "1px solid #e5e7eb" }}>
+                                            <p style={{ margin: "0 0 6px", fontSize: "13px", color: "#555", fontWeight: "bold" }}>
+                                                Limit potrošnje (upozorenje putem email-a)
+                                            </p>
+                                            <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", alignItems: "center" }}>
+                                                <select
+                                                    style={{ ...inputStyle, width: "120px" }}
+                                                    value={limitForms[m.id]?.unit ?? "Kwh"}
+                                                    onChange={e => setLimitForms(prev => ({
+                                                        ...prev,
+                                                        [m.id]: {
+                                                            unit: e.target.value as ConsumptionLimitUnit,
+                                                            limitValue: prev[m.id]?.limitValue ?? ""
+                                                        }
+                                                    }))}
+                                                >
+                                                    <option value="Kwh">kWh</option>
+                                                    <option value="Rsd">RSD</option>
+                                                </select>
+                                                <input
+                                                    style={{ ...inputStyle, width: "140px" }}
+                                                    type="number"
+                                                    min="0"
+                                                    step="0.01"
+                                                    placeholder="npr. 350"
+                                                    value={limitForms[m.id]?.limitValue ?? ""}
+                                                    onChange={e => setLimitForms(prev => ({
+                                                        ...prev,
+                                                        [m.id]: {
+                                                            unit: prev[m.id]?.unit ?? "Kwh",
+                                                            limitValue: e.target.value
+                                                        }
+                                                    }))}
+                                                />
+                                                <button
+                                                    onClick={() => handleSaveLimit(m.id)}
+                                                    disabled={limitSubmitting === m.id}
+                                                    style={btnPrimary}
+                                                >
+                                                    {limitSubmitting === m.id ? "Čuvanje..." : "Sačuvaj limit"}
+                                                </button>
+                                                <button
+                                                    onClick={() => handleClearLimit(m.id)}
+                                                    disabled={limitSubmitting === m.id}
+                                                    style={btnSecondary}
+                                                >
+                                                    Ukloni limit
+                                                </button>
+                                            </div>
+                                        </div>
                                     </>
                                 )}
                             </div>
