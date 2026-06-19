@@ -192,9 +192,12 @@ namespace SmartGrid.Application.Features.Billing.Commands
             var higherCoef = totalKwh <= 0 ? 0 : higherKwh / totalKwh;
             var lowerCoef = totalKwh <= 0 ? 0 : lowerKwh / totalKwh;
 
-            var greenTotal = Math.Min(totalKwh, 350);
-            var blueTotal = Math.Max(0, Math.Min(totalKwh - 350, 850));
-            var redTotal = Math.Max(0, totalKwh - 1200);
+            var greenLimit = tariffModel.GreenZoneLimitKwh;
+            var blueLimit = tariffModel.BlueZoneLimitKwh;
+
+            var greenTotal = Math.Min(totalKwh, greenLimit);
+            var blueTotal = Math.Max(0, Math.Min(totalKwh - greenLimit, blueLimit - greenLimit));
+            var redTotal = Math.Max(0, totalKwh - blueLimit);
 
             var greenVt = greenTotal * higherCoef;
             var greenNt = greenTotal * lowerCoef;

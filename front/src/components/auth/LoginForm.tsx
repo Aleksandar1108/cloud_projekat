@@ -121,6 +121,9 @@ export default function LoginForm({ handleSubmit, onSubmit, register, errors }: 
             <label>
                 <a href="/forgot-password">forgot password?</a>
             </label>
+            <label>
+                <a href="/register">Don't have an account? Register</a>
+            </label>
         </form>
     );
 }

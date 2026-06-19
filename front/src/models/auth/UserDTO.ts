@@ -4,4 +4,5 @@ export type UserDTO = {
     role: string;
     createdAt: string;
     isActivated: boolean;
+    isSuspended: boolean;
 };

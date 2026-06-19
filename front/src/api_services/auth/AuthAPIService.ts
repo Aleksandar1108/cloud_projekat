@@ -62,10 +62,78 @@ export const AuthAPIService: IAuthAPIService = {
         }
     },
 
-    async activateUser(token: string, password: string): Promise<AuthResponse> {
+    async createUser(email: string, role: string): Promise<AuthResponse> {
+        try {
+            const res = await axios.post<AuthResponse>(
+                buildApiUrl("users"),
+                { email, role }
+            );
+
+            return res.data;
+        }
+        catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
+                const data: AuthResponse = error.response.data;
+
+                return {
+                    error: data.message || data.error || "Unknown error"
+                };
+            }
+
+            return {
+                error: "Server error"
+            };
+        }
+    },
+
+    async setUserSuspension(userId: string, suspend: boolean): Promise<AuthResponse> {
+        try {
+            return await axios.patch<AuthResponse>(
+                buildApiUrl(`users/${userId}/suspension`),
+                { suspend }
+            ).then(res => res.data);
+        }
+        catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
+                const data = error.response.data;
+
+                return {
+                    error: data.message || data.type || "Unknown error"
+                };
+            }
+
+            return {
+                error: "Server error"
+            };
+        }
+    },
+
+    async activateAccount(token: string): Promise<AuthResponse> {
         try {
             return await axios.post<AuthResponse>(
                 buildApiUrl("users/activate"),
+                { token }
+            ).then(res => res.data);
+        }
+        catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
+                const data: AuthResponse = error.response.data;
+
+                return {
+                    error: data.message ||
+                        "Unknown error"
+                };
+            }
+
+            return {
+                error: "Server error"
+            };
+        }
+    },
+    async setPassword(token: string, password: string): Promise<AuthResponse> {
+        try {
+            return await axios.post<AuthResponse>(
+                buildApiUrl("users/set-password"),
                 { token, password }
             ).then(res => res.data);
         }

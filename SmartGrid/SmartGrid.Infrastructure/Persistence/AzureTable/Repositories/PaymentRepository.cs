@@ -27,6 +27,15 @@ namespace SmartGrid.Infrastructure.Persistence.AzureTable.Repositories
             return await base.GetByIdAsync(partitionKey, rowKey, ct);
         }
 
+        public async Task<IReadOnlyList<PaymentDto>> GetByPeriodAsync(int year, int month, CancellationToken ct = default)
+        {
+            var partitionKey = $"{year:D4}-{month:D2}";
+            var results = await base.QueryByPartitionKeyAsync(partitionKey, ct);
+            return results
+                .OrderByDescending(x => x.CreatedAtUtc)
+                .ToList();
+        }
+
         public async Task<PaymentDto?> GetByStripeSessionIdAsync(string stripeSessionId, CancellationToken ct = default)
         {
             // Table Storage doesn't support efficient secondary indexes; we query within recent partitions by convention.

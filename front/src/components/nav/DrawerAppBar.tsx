@@ -17,22 +17,59 @@ import Button from '@mui/material/Button';
 
 import { useNavigate } from 'react-router-dom';
 import LoginButton from '../auth/LoginButton';
+import { useAuth } from '../../hooks/auth/useAuthHook';
+import { ERoles } from '../../enums/user/UserRole';
 
 const drawerWidth = 240;
 
+type NavItem = {
+    label: string;
+    path: string;
+    roles?: string[];
+};
 
-const navItems = [
+const navItems: NavItem[] = [
     {
         label: "Home",
         path: "/"
     },
     {
-        label: "Users",
-        path: "/users"
+        label: "Properties",
+        path: "/properties",
+        roles: [ERoles.User]
     },
     {
-        label: "Other",
-        path: "/properties"
+        label: "Telemetry",
+        path: "/telemetry-analytics",
+        roles: [ERoles.User]
+    },
+    {
+        label: "Billing",
+        path: "/monthly-billing"
+    },
+    {
+        label: "Manual Readings",
+        path: "/manual-readings"
+    },
+    {
+        label: "Tariffs",
+        path: "/tariffs",
+        roles: [ERoles.Admin, ERoles.SysAdmin]
+    },
+    {
+        label: "Payments",
+        path: "/payments",
+        roles: [ERoles.Admin, ERoles.SysAdmin]
+    },
+    {
+        label: "Network",
+        path: "/network",
+        roles: [ERoles.Admin, ERoles.SysAdmin]
+    },
+    {
+        label: "Users",
+        path: "/users",
+        roles: [ERoles.SysAdmin]
     }
 ];
 
@@ -42,6 +79,13 @@ export default function DrawerAppBar() {
         React.useState(false);
 
     const navigate = useNavigate();
+    const { isAuthenticated, user } = useAuth();
+
+    const visibleNavItems = isAuthenticated
+        ? navItems.filter(
+            (item) => !item.roles || item.roles.includes(user?.role ?? "")
+        )
+        : [];
 
     const handleDrawerToggle = () => {
 
@@ -66,7 +110,7 @@ export default function DrawerAppBar() {
 
             <List>
 
-                {navItems.map((item) => (
+                {visibleNavItems.map((item) => (
 
                     <ListItem
                         key={item.label}
@@ -149,7 +193,7 @@ export default function DrawerAppBar() {
                         }}
                     >
 
-                        {navItems.map((item) => (
+                        {visibleNavItems.map((item) => (
 
                             <Button
                                 key={item.label}

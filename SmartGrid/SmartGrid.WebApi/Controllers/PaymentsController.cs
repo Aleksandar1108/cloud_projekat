@@ -1,19 +1,34 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartGrid.Application.Features.Payments;
 using SmartGrid.Application.Interfaces;
 using SmartGrid.Application.Interfaces.Repositories;
+using SmartGrid.WebApi.Authorization;
 using SmartGrid.WebApi.DTOs;
 
 namespace SmartGrid.WebApi.Controllers
 {
     [Route("api/payments")]
     [ApiController]
+    [Authorize]
     public class PaymentsController(
         IMonthlyBillRepository monthlyBillRepository,
         IPaymentRepository paymentRepository,
         IPaymentCheckoutService checkoutService)
         : ControllerBase
     {
+        [Authorize(Roles = Roles.AnyAdmin)]
+        [HttpGet]
+        public async Task<IActionResult> GetPayments([FromQuery] int? year, [FromQuery] int? month, CancellationToken ct)
+        {
+            var now = DateTime.UtcNow;
+            var targetYear = year ?? now.Year;
+            var targetMonth = month ?? now.Month;
+
+            var payments = await paymentRepository.GetByPeriodAsync(targetYear, targetMonth, ct);
+            return Ok(payments);
+        }
+
         [HttpPost("checkout-session")]
         public async Task<IActionResult> CreateCheckoutSession([FromBody] CreateCheckoutSessionRequestDto request, CancellationToken ct)
         {

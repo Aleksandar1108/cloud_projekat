@@ -10,7 +10,11 @@ CREATE TABLE Users (
   role VARCHAR(45) NOT NULL,
   accountCreated DATETIME NOT NULL,
   isActivated BIT NOT NULL,
+  isSuspended BIT NOT NULL DEFAULT 0,
   PRIMARY KEY (idUsers));
+
+-- Za postojecu bazu (ako tabela Users vec postoji bez kolone isSuspended):
+-- ALTER TABLE Users ADD isSuspended BIT NOT NULL DEFAULT 0;
 
 CREATE TABLE EmailActivation (
   idEmailActivation UNIQUEIDENTIFIER NOT NULL,
@@ -39,8 +43,13 @@ CREATE TABLE TariffModels (
   redZoneNtPrice FLOAT NOT NULL,
   networkCostPerKw FLOAT NOT NULL,
   supplierCost FLOAT NOT NULL,
-  approvedPowerKw FLOAT NOT NULL
+  approvedPowerKw FLOAT NOT NULL,
+  greenZoneLimitKwh FLOAT NOT NULL DEFAULT 350,
+  blueZoneLimitKwh FLOAT NOT NULL DEFAULT 1200
 );
+
+-- Za postojecu bazu (ako tabela TariffModels vec postoji bez zonskih pragova):
+-- ALTER TABLE TariffModels ADD greenZoneLimitKwh FLOAT NOT NULL DEFAULT 350, blueZoneLimitKwh FLOAT NOT NULL DEFAULT 1200;
 
 -- Razmotritii dodavanje kaskadnog brisanja (pogotovo zbog user-a)
 CREATE TABLE Properties (

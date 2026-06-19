@@ -6,6 +6,7 @@ namespace SmartGrid.Application.Interfaces.Repositories
     {
         Task<PaymentDto?> GetByBillAsync(string deviceId, int year, int month, CancellationToken ct = default);
         Task<PaymentDto?> GetByStripeSessionIdAsync(string stripeSessionId, CancellationToken ct = default);
+        Task<IReadOnlyList<PaymentDto>> GetByPeriodAsync(int year, int month, CancellationToken ct = default);
         Task UpsertAsync(PaymentDto payment, CancellationToken ct = default);
     }
 }

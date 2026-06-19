@@ -64,6 +64,7 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories
             entity.Role = user.Role.ToString();
             entity.AccountCreated = user.AccountCreated;
             entity.IsActive = user.ActivationStatus.Value;
+            entity.IsSuspended = user.IsSuspended;
 
             _context.Users.Update(entity);
             await _context.SaveChangesAsync(ct);

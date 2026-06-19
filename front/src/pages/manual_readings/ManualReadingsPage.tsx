@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../hooks/auth/useAuthHook";
-import { approveManualReading, getManualReadings, submitManualReading } from "../../api_services/manual_readings/ManualReadingsAPIService";
+import { approveManualReading, getManualReadings, getManualReadingImageUrl, submitManualReading } from "../../api_services/manual_readings/ManualReadingsAPIService";
 import type { ManualReading } from "../../types/manual_readings/ManualReading";
 
 function ManualReadingsPage() {
@@ -13,6 +13,8 @@ function ManualReadingsPage() {
     const [message, setMessage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [pendingItems, setPendingItems] = useState<ManualReading[]>([]);
+    const [processedItems, setProcessedItems] = useState<ManualReading[]>([]);
+    const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const isAdmin = useMemo(() => {
@@ -20,14 +22,33 @@ function ManualReadingsPage() {
         return role === "admin" || role === "sysadmin";
     }, [user?.role]);
 
-    const loadPending = async () => {
+    const loadImages = async (items: ManualReading[]) => {
+        const entries = await Promise.all(
+            items.map(async (item) => [item.id, await getManualReadingImageUrl(item.id)] as const)
+        );
+        setImageUrls((prev) => {
+            const next = { ...prev };
+            for (const [id, url] of entries) {
+                if (url) next[id] = url;
+            }
+            return next;
+        });
+    };
+
+    const loadReadings = async () => {
         if (!isAdmin) return;
-        const data = await getManualReadings("Pending");
-        setPendingItems(data);
+        const [pending, processed] = await Promise.all([
+            getManualReadings("Pending"),
+            getManualReadings("Processed")
+        ]);
+        setPendingItems(pending);
+        setProcessedItems(processed);
+        void loadImages([...pending, ...processed]);
     };
 
     useEffect(() => {
-        void loadPending();
+        void loadReadings();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAdmin]);
 
     if (!isAuthenticated) return <Navigate to="/login" />;
@@ -54,7 +75,7 @@ function ManualReadingsPage() {
             setDeviceId("");
             setReadingKwh("");
             setFile(null);
-            if (isAdmin) await loadPending();
+            if (isAdmin) await loadReadings();
         } catch {
             setError("Neuspesno slanje manuelnog ocitavanja.");
         } finally {
@@ -64,7 +85,7 @@ function ManualReadingsPage() {
 
     const onApprove = async (id: string) => {
         await approveManualReading(id);
-        await loadPending();
+        await loadReadings();
     };
 
     return (
@@ -90,14 +111,35 @@ function ManualReadingsPage() {
                     <h2 style={{ fontSize: "22px", marginTop: 0 }}>Admin odobravanje (Pending)</h2>
                     {pendingItems.length === 0 && <p>Nema pending zahteva.</p>}
                     {pendingItems.map((item) => (
-                        <article key={item.id} style={{ borderTop: "1px solid #f3f4f6", paddingTop: "10px", marginTop: "10px" }}>
-                            <p><b>Device:</b> {item.deviceId}</p>
-                            <p><b>kWh:</b> {item.readingKwh}</p>
-                            <p><b>Vreme:</b> {new Date(item.readingAtUtc).toLocaleString()}</p>
-                            <p><b>Poslao:</b> {item.submitterEmail}</p>
-                            <button onClick={() => void onApprove(item.id)} style={{ backgroundColor: "#0f766e", color: "white", border: "none", borderRadius: "8px", padding: "8px 10px", cursor: "pointer" }}>
-                                Odobri unos
-                            </button>
+                        <article key={item.id} style={{ display: "flex", gap: "14px", borderTop: "1px solid #f3f4f6", paddingTop: "10px", marginTop: "10px" }}>
+                            {imageUrls[item.id]
+                                ? <img src={imageUrls[item.id]} alt="Dokaz ocitavanja" style={{ width: "140px", height: "140px", objectFit: "cover", borderRadius: "8px", border: "1px solid #e5e7eb" }} />
+                                : <div style={{ width: "140px", height: "140px", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "8px", border: "1px dashed #d1d5db", color: "#9ca3af", fontSize: "12px" }}>Bez slike</div>}
+                            <div style={{ flex: 1 }}>
+                                <p style={{ margin: "2px 0" }}><b>Device:</b> {item.deviceId}</p>
+                                <p style={{ margin: "2px 0" }}><b>kWh:</b> {item.readingKwh}</p>
+                                <p style={{ margin: "2px 0" }}><b>Vreme:</b> {new Date(item.readingAtUtc).toLocaleString()}</p>
+                                <p style={{ margin: "2px 0" }}><b>Poslao:</b> {item.submitterEmail}</p>
+                                <button onClick={() => void onApprove(item.id)} style={{ marginTop: "6px", backgroundColor: "#0f766e", color: "white", border: "none", borderRadius: "8px", padding: "8px 10px", cursor: "pointer" }}>
+                                    Odobri unos
+                                </button>
+                            </div>
+                        </article>
+                    ))}
+
+                    <h2 style={{ fontSize: "22px", marginTop: "24px" }}>Odobreno (Processed)</h2>
+                    {processedItems.length === 0 && <p>Jos nema odobrenih ocitavanja.</p>}
+                    {processedItems.map((item) => (
+                        <article key={item.id} style={{ display: "flex", gap: "14px", borderTop: "1px solid #f3f4f6", paddingTop: "10px", marginTop: "10px", opacity: 0.9 }}>
+                            {imageUrls[item.id]
+                                ? <img src={imageUrls[item.id]} alt="Dokaz ocitavanja" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "8px", border: "1px solid #e5e7eb" }} />
+                                : <div style={{ width: "100px", height: "100px", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "8px", border: "1px dashed #d1d5db", color: "#9ca3af", fontSize: "12px" }}>Bez slike</div>}
+                            <div style={{ flex: 1 }}>
+                                <p style={{ margin: "2px 0" }}><b>Device:</b> {item.deviceId}</p>
+                                <p style={{ margin: "2px 0" }}><b>kWh:</b> {item.readingKwh}</p>
+                                <p style={{ margin: "2px 0" }}><b>Vreme:</b> {new Date(item.readingAtUtc).toLocaleString()}</p>
+                                <span style={{ display: "inline-block", marginTop: "4px", color: "#16a34a", fontWeight: 700 }}>Processed</span>
+                            </div>
                         </article>
                     ))}
                 </section>

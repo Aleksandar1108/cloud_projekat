@@ -54,6 +54,22 @@ function UsersList({
         }
     };
 
+    const handleToggleSuspension = async (userId: string, suspend: boolean) => {
+        try {
+            const result = await AuthAPIService.setUserSuspension(userId, suspend);
+
+            if (result.error) {
+                alert(`Failed to update suspension: ${result.error}`);
+            }
+            else {
+                setUsers(prev => prev.map(user => user.idUser === userId ? { ...user, isSuspended: suspend } : user));
+            }
+        }
+        catch {
+            alert("Failed to update suspension.");
+        }
+    };
+
     const handleResetPassword = async ( email: string) => {
         try {
             const result =
@@ -145,6 +161,13 @@ function UsersList({
                                     padding: "16px",
                                     textAlign: "left"
                                 }}>
+                                    Suspended
+                                </th>
+
+                                <th style={{
+                                    padding: "16px",
+                                    textAlign: "left"
+                                }}>
                                     Actions
                                 </th>
 
@@ -158,7 +181,7 @@ function UsersList({
 
                                     <tr>
                                         <td
-                                            colSpan={6}
+                                            colSpan={7}
                                             style={{
                                                 padding: "24px",
                                                 textAlign: "center"
@@ -268,10 +291,66 @@ function UsersList({
                                             </td>
 
                                             <td style={{
+                                                padding: "16px"
+                                            }}>
+
+                                                <span style={{
+                                                    padding: "6px 10px",
+                                                    borderRadius: "999px",
+                                                    fontSize: "13px",
+                                                    fontWeight: 600,
+                                                    backgroundColor:
+                                                        user.isSuspended
+                                                            ? "#fee2e2"
+                                                            : "#dcfce7",
+                                                    color:
+                                                        user.isSuspended
+                                                            ? "#991b1b"
+                                                            : "#166534"
+                                                }}>
+                                                    {
+                                                        user.isSuspended
+                                                            ? "Suspended"
+                                                            : "Active"
+                                                    }
+                                                </span>
+
+                                            </td>
+
+                                            <td style={{
                                                 padding: "16px",
                                                 display: "flex",
                                                 gap: "10px"
                                             }}>
+
+                                                <button
+                                                    onClick={() =>
+                                                        handleToggleSuspension(
+                                                            user.idUser,
+                                                            !user.isSuspended
+                                                        )
+                                                    }
+                                                    style={{
+                                                        backgroundColor:
+                                                            user.isSuspended
+                                                                ? "#16a34a"
+                                                                : "#d97706",
+                                                        color: "#ffffff",
+                                                        border: "none",
+                                                        padding:
+                                                            "10px 14px",
+                                                        borderRadius:
+                                                            "8px",
+                                                        cursor: "pointer",
+                                                        fontWeight: 600
+                                                    }}
+                                                >
+                                                    {
+                                                        user.isSuspended
+                                                            ? "Activate"
+                                                            : "Suspend"
+                                                    }
+                                                </button>
 
                                                 <button
                                                     onClick={() =>

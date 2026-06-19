@@ -30,6 +30,12 @@ namespace SmartGrid.Application.Features.Users.Command
                 if (!existing.Password.Verify(request.Password))
                     return Result<AuthResponse>.Failure("Invalid password", ErrorType.Unauthorized);
 
+                if (existing.IsSuspended)
+                    return Result<AuthResponse>.Failure("Account is suspended. Please contact the administrator.", ErrorType.Unauthorized);
+
+                if (!existing.ActivationStatus.Value)
+                    return Result<AuthResponse>.Failure("Account is not activated. Please activate your account via the email link.", ErrorType.Unauthorized);
+
                 var token = jwtService.GenerateToken(existing);
 
                 return Result<AuthResponse>.Success(new AuthResponse(token, DateTime.UtcNow.AddHours(2)));

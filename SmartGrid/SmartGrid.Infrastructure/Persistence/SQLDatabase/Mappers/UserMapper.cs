@@ -15,7 +15,8 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Mappers
                 Enum.Parse<Domain.Enums.UserRole>(entity.Role),
                 new PasswordHash(entity.Password),
                 entity.AccountCreated,
-                entity.IsActive ? ActivationStatus.Activated() : ActivationStatus.NotActivated()
+                entity.IsActive ? ActivationStatus.Activated() : ActivationStatus.NotActivated(),
+                entity.IsSuspended
             );
         }
 
@@ -28,7 +29,8 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Mappers
                 Password = domain.Password.Value,
                 Role = domain.Role.ToString(),
                 AccountCreated = domain.AccountCreated,
-                IsActive = domain.ActivationStatus.Value
+                IsActive = domain.ActivationStatus.Value,
+                IsSuspended = domain.IsSuspended
             };
 
         }

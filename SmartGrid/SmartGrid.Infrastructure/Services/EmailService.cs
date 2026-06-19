@@ -1,225 +1,73 @@
-﻿using Mailjet.Client;
-using Mailjet.Client.Resources;
-using Newtonsoft.Json.Linq;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SmartGrid.Application.Interfaces;
 using SmartGrid.Infrastructure.Common;
+using SmartGrid.Infrastructure.Common.Options;
+using System.Net;
+using System.Net.Mail;
 
 namespace SmartGrid.Infrastructure.Services
 {
-    public class EmailService(ILogger<EmailService> logger) : IEmailService
+    public class EmailService(ILogger<EmailService> logger, IOptions<SmtpOptions> smtpOptions) : IEmailService
     {
-        public async Task SendActivationEmailAsync(string to, string subject, string link,CancellationToken ct)
-        {
-            var apiKey = Environment.GetEnvironmentVariable("MAILJET_API_KEY");
-            var apiSecret = Environment.GetEnvironmentVariable("MAILJET_API_SECRET");
-            var senderEmail = Environment.GetEnvironmentVariable("MAILJET_SENDER_EMAIL");
-            var senderName = Environment.GetEnvironmentVariable("MAILJET_SENDER_NAME");
+        private readonly SmtpOptions _smtp = smtpOptions.Value;
 
-            if (string.IsNullOrWhiteSpace(apiKey)
-                || string.IsNullOrWhiteSpace(apiSecret)
-                || string.IsNullOrWhiteSpace(senderEmail)
-                || string.IsNullOrWhiteSpace(senderName))
+        public Task SendActivationEmailAsync(string to, string subject, string link, CancellationToken ct)
+        {
+            var html = EmailTemplate.Activation(link);
+            var text = $"Activate your SmartGrid account by visiting this link: {link}";
+            return SendAsync(to, subject, text, html, ct);
+        }
+
+        public Task SendPasswordResetEmailAsync(string to, string subject, string link, CancellationToken ct)
+        {
+            var html = EmailTemplate.PasswordReset(link);
+            var text = $"Reset your SmartGrid password by visiting this link: {link}";
+            return SendAsync(to, subject, text, html, ct);
+        }
+
+        public Task SendEmailAsync(string to, string subject, string textBody, string htmlBody, CancellationToken ct)
+            => SendAsync(to, subject, textBody, htmlBody, ct);
+
+        public Task SendEmailAsync(string to, string subject, string text, CancellationToken ct)
+            => SendAsync(to, subject, text, htmlBody: null, ct);
+
+        private async Task SendAsync(string to, string subject, string textBody, string? htmlBody, CancellationToken ct)
+        {
+            if (string.IsNullOrWhiteSpace(_smtp.Host)
+                || string.IsNullOrWhiteSpace(_smtp.Username)
+                || string.IsNullOrWhiteSpace(_smtp.Password)
+                || string.IsNullOrWhiteSpace(_smtp.FromEmail))
             {
-                logger.LogDebug(
-                    "Mailjet env vars are not configured; skipping email send. To={To}, Subject={Subject}",
+                logger.LogWarning(
+                    "SMTP is not configured; skipping email send. To={To}, Subject={Subject}",
                     to,
                     subject);
                 return;
             }
 
-            var htmlBody = EmailTemplate.Activation(link);
-
-            MailjetClient client = new MailjetClient(
-                apiKey,
-                apiSecret
-            );
-
-            MailjetRequest request = new MailjetRequest
+            try
             {
-                Resource = Send.Resource,
+                using var message = new MailMessage
+                {
+                    From = new MailAddress(_smtp.FromEmail, _smtp.FromName),
+                    Subject = subject,
+                    Body = htmlBody ?? textBody,
+                    IsBodyHtml = htmlBody is not null,
+                };
+                message.To.Add(to);
+
+                using var client = new SmtpClient(_smtp.Host, _smtp.Port)
+                {
+                    EnableSsl = _smtp.EnableSsl,
+                    Credentials = new NetworkCredential(_smtp.Username, _smtp.Password),
+                };
+
+                await client.SendMailAsync(message, ct);
             }
-            .Property(Send.FromEmail, Environment.GetEnvironmentVariable("MAILJET_SENDER_EMAIL"))
-            .Property(Send.FromName, senderName)
-            .Property(Send.Subject, subject)
-            .Property(Send.TextPart, $"Activate your SmartGrid account by visiting this link: {link}")
-            .Property(Send.HtmlPart, htmlBody)
-            .Property(Send.Recipients, new JArray {
-            new JObject {
-                { "Email", to }
-            }
-            });
-
-            MailjetResponse response = await client.PostAsync(request);
-
-            if (!response.IsSuccessStatusCode)
+            catch (Exception ex)
             {
-                logger.LogWarning(
-                    "Mailjet send failed. StatusCode={StatusCode}, Error={ErrorMessage}",
-                    response.StatusCode,
-                    response.GetErrorMessage());
-            }
-        }
-
-
-        public async Task SendPasswordResetEmailAsync(string to, string subject, string link, CancellationToken ct)
-        {
-            var apiKey = Environment.GetEnvironmentVariable("MAILJET_API_KEY");
-            var apiSecret = Environment.GetEnvironmentVariable("MAILJET_API_SECRET");
-            var senderEmail = Environment.GetEnvironmentVariable("MAILJET_SENDER_EMAIL");
-            var senderName = Environment.GetEnvironmentVariable("MAILJET_SENDER_NAME");
-
-            if (string.IsNullOrWhiteSpace(apiKey)
-                || string.IsNullOrWhiteSpace(apiSecret)
-                || string.IsNullOrWhiteSpace(senderEmail)
-                || string.IsNullOrWhiteSpace(senderName))
-            {
-                logger.LogDebug(
-                    "Mailjet env vars are not configured; skipping email send. To={To}, Subject={Subject}",
-                    to,
-                    subject);
-                return;
-            }
-
-            var htmlBody = EmailTemplate.PasswordReset(link);
-
-            MailjetClient client = new MailjetClient(
-                apiKey,
-                apiSecret
-            );
-
-            MailjetRequest request = new MailjetRequest
-            {
-                Resource = Send.Resource,
-            }
-            .Property(Send.FromEmail, Environment.GetEnvironmentVariable("MAILJET_SENDER_EMAIL"))
-            .Property(Send.FromName, senderName)
-            .Property(Send.Subject, subject)
-            .Property(Send.TextPart, $"Activate your SmartGrid account by visiting this link: {link}")
-            .Property(Send.HtmlPart, htmlBody)
-            .Property(Send.Recipients, new JArray {
-            new JObject {
-                { "Email", to }
-            }
-            });
-
-            MailjetResponse response = await client.PostAsync(request);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                logger.LogWarning(
-                    "Mailjet send failed. StatusCode={StatusCode}, Error={ErrorMessage}",
-                    response.StatusCode,
-                    response.GetErrorMessage());
-            }
-        }
-
-        public async Task SendEmailAsync(
-        string to,
-        string subject,
-        string textBody,
-        string htmlBody,
-        CancellationToken ct)
-        {
-            var apiKey = Environment.GetEnvironmentVariable("MAILJET_API_KEY");
-            var apiSecret = Environment.GetEnvironmentVariable("MAILJET_API_SECRET");
-            var senderEmail = Environment.GetEnvironmentVariable("MAILJET_SENDER_EMAIL");
-            var senderName = Environment.GetEnvironmentVariable("MAILJET_SENDER_NAME");
-
-            if (string.IsNullOrWhiteSpace(apiKey)
-                || string.IsNullOrWhiteSpace(apiSecret)
-                || string.IsNullOrWhiteSpace(senderEmail)
-                || string.IsNullOrWhiteSpace(senderName))
-            {
-                logger.LogDebug(
-                    "Mailjet env vars are not configured; skipping email send. To={To}, Subject={Subject}",
-                    to,
-                    subject);
-
-                return;
-            }
-
-            var client = new MailjetClient(apiKey, apiSecret);
-
-            var request = new MailjetRequest
-            {
-                Resource = Send.Resource,
-            }
-            .Property(Send.FromEmail, senderEmail)
-            .Property(Send.FromName, senderName)
-            .Property(Send.Subject, subject)
-            .Property(Send.TextPart, textBody)
-            .Property(Send.HtmlPart, htmlBody)
-            .Property(Send.Recipients, new JArray
-            {
-        new JObject
-        {
-            { "Email", to }
-        }
-            });
-
-            var response = await client.PostAsync(request);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                logger.LogWarning(
-                    "Mailjet send failed. StatusCode={StatusCode}, Error={ErrorMessage}",
-                    response.StatusCode,
-                    response.GetErrorMessage());
-            }
-        }
-
-
-        public async Task SendEmailAsync(
-        string to,
-        string subject,
-        string text,
-        CancellationToken ct)
-        {
-            var apiKey = Environment.GetEnvironmentVariable("MAILJET_API_KEY");
-            var apiSecret = Environment.GetEnvironmentVariable("MAILJET_API_SECRET");
-            var senderEmail = Environment.GetEnvironmentVariable("MAILJET_SENDER_EMAIL");
-            var senderName = Environment.GetEnvironmentVariable("MAILJET_SENDER_NAME");
-
-            if (string.IsNullOrWhiteSpace(apiKey)
-                || string.IsNullOrWhiteSpace(apiSecret)
-                || string.IsNullOrWhiteSpace(senderEmail)
-                || string.IsNullOrWhiteSpace(senderName))
-            {
-                logger.LogDebug(
-                    "Mailjet env vars are not configured; skipping email send. To={To}, Subject={Subject}",
-                    to,
-                    subject);
-
-                return;
-            }
-
-            var client = new MailjetClient(apiKey, apiSecret);
-
-            var request = new MailjetRequest
-            {
-                Resource = Send.Resource,
-            }
-            .Property(Send.FromEmail, senderEmail)
-            .Property(Send.FromName, senderName)
-            .Property(Send.Subject, subject)
-            .Property(Send.TextPart, text)
-            .Property(Send.Recipients, new JArray
-            {
-        new JObject
-        {
-            { "Email", to }
-        }
-            });
-
-            var response = await client.PostAsync(request);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                logger.LogWarning(
-                    "Mailjet send failed. StatusCode={StatusCode}, Error={ErrorMessage}",
-                    response.StatusCode,
-                    response.GetErrorMessage());
+                logger.LogError(ex, "Failed to send email to {To} with subject {Subject}", to, subject);
             }
         }
     }

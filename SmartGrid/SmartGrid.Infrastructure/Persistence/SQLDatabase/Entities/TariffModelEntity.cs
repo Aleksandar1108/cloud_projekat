@@ -20,5 +20,8 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Entities
         public double NetworkCostPerKw { get; set; }
         public double SupplierCost { get; set; }
         public double ApprovedPowerKw { get; set; }
+
+        public double GreenZoneLimitKwh { get; set; }
+        public double BlueZoneLimitKwh { get; set; }
     }
 }
