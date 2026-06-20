@@ -14,6 +14,10 @@ import ActivateAccountPage from './pages/auth/ActivateAccountPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
 import MainLayout from './layouts/MainLayout'
 import TelemetryAnalyticsPage from './pages/telemetry/TelemetryAnalyticsPage'
+import TariffModelsPage from './pages/admin/TariffModelsPage'
+import AdminBillingPage from './pages/admin/AdminBillingPage'
+import AdminNetworkPage from './pages/admin/AdminNetworkPage'
+import AdminBillingDeliveryPage from './pages/admin/AdminBillingDeliveryPage'
 
 function App() {
 
@@ -30,6 +34,10 @@ function App() {
           <Route path='/properties' element={<PropertiesPage />}></Route>
           <Route path='/properties/:id' element={<PropertyDetailPage />}></Route>
           <Route path='/telemetry-analytics' element={<TelemetryAnalyticsPage />}></Route>
+          <Route path='/admin/tariffs' element={<TariffModelsPage />}></Route>
+          <Route path='/admin/billing' element={<AdminBillingPage />}></Route>
+          <Route path='/admin/network' element={<AdminNetworkPage />}></Route>
+          <Route path='/admin/delivery' element={<AdminBillingDeliveryPage />}></Route>
           <Route path="*" element={<Navigate to="/404" replace />} />
 
         </Route>
