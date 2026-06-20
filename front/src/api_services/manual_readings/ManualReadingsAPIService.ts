@@ -31,14 +31,3 @@ export async function getManualReadings(status?: "Pending" | "Processed"): Promi
 export async function approveManualReading(id: string): Promise<void> {
     await axios.post(buildApiUrl(`api/manual-readings/${id}/approve`));
 }
-
-export async function getManualReadingImageUrl(id: string): Promise<string | null> {
-    try {
-        const res = await axios.get(buildApiUrl(`api/manual-readings/${id}/image`), {
-            responseType: "blob"
-        });
-        return URL.createObjectURL(res.data as Blob);
-    } catch {
-        return null;
-    }
-}

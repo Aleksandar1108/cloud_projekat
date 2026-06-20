@@ -7,6 +7,5 @@
         public string Role { get; set; }
         public string CreatedAt { get; set; }
         public bool IsActivated { get; set; }
-        public bool IsSuspended { get; set; }
     }
 }

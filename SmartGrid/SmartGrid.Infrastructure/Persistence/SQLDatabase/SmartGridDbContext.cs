@@ -37,10 +37,6 @@ public class SmartGridDbContext : DbContext
             entity.Property(e => e.IsActive)
                   .IsRequired()
                   .HasColumnName("isActivated");
-            entity.Property(e => e.IsSuspended)
-                  .IsRequired()
-                  .HasColumnName("isSuspended")
-                  .HasDefaultValue(false);
         });
         modelBuilder.Entity<EmailActivationEntity>(entity =>
         {
@@ -127,9 +123,6 @@ public class SmartGridDbContext : DbContext
             entity.Property(e => e.NetworkCostPerKw).IsRequired();
             entity.Property(e => e.SupplierCost).IsRequired();
             entity.Property(e => e.ApprovedPowerKw).IsRequired();
-
-            entity.Property(e => e.GreenZoneLimitKwh).IsRequired().HasDefaultValue(350);
-            entity.Property(e => e.BlueZoneLimitKwh).IsRequired().HasDefaultValue(1200);
         });
 
     }

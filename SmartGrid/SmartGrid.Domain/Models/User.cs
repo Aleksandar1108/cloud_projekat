@@ -15,8 +15,6 @@ namespace SmartGrid.Domain.Models
 
         public ActivationStatus ActivationStatus { get; private set; } = ActivationStatus.NotActivated();
 
-        public bool IsSuspended { get; private set; }
-
         public User(UserId id, Email email, PasswordHash password)
         {
             Id = id;
@@ -24,10 +22,9 @@ namespace SmartGrid.Domain.Models
             Password = password;
             AccountCreated = DateTime.UtcNow;
             ActivationStatus = ActivationStatus.NotActivated();
-            IsSuspended = false;
         }
 
-        public User(UserId id, Email email, UserRole role, PasswordHash password, DateTime accountCreated, ActivationStatus activationStatus, bool isSuspended = false)
+        public User(UserId id, Email email, UserRole role, PasswordHash password, DateTime accountCreated, ActivationStatus activationStatus)
         {
             Id = id;
             Email = email;
@@ -35,7 +32,6 @@ namespace SmartGrid.Domain.Models
             Password = password;
             AccountCreated = accountCreated;
             ActivationStatus = activationStatus;
-            IsSuspended = isSuspended;
         }
 
         public void Activate()
@@ -46,16 +42,6 @@ namespace SmartGrid.Domain.Models
         public void Deactivate()
         {
             ActivationStatus = ActivationStatus.NotActivated();
-        }
-
-        public void Suspend()
-        {
-            IsSuspended = true;
-        }
-
-        public void Reactivate()
-        {
-            IsSuspended = false;
         }
 
         public void ChangeRole(UserRole role)
@@ -70,23 +56,6 @@ namespace SmartGrid.Domain.Models
                 Email.Create(email).Value,
                 Domain.Enums.UserRole.User,
                 PasswordHash.FromPlainPassword(password),
-                DateTime.UtcNow,
-                ActivationStatus.NotActivated()
-            );
-        }
-
-        /// <summary>
-        /// Creates a user from the admin panel with an assigned role. The account is
-        /// created inactive with a random placeholder password; the user sets their own
-        /// password later through the activation link sent by email.
-        /// </summary>
-        public static User CreateByAdmin(string email, UserRole role)
-        {
-            return new User(
-                UserId.New(),
-                Email.Create(email).Value,
-                role,
-                PasswordHash.FromPlainPassword(Guid.NewGuid().ToString("N")),
                 DateTime.UtcNow,
                 ActivationStatus.NotActivated()
             );

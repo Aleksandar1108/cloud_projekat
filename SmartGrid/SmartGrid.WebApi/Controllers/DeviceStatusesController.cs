@@ -1,15 +1,12 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartGrid.Application.Features.DeviceStatuses.Queries;
-using SmartGrid.WebApi.Authorization;
 using SmartGrid.WebApi.Extensions;
 
 namespace SmartGrid.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = Roles.AnyAdmin)]
     public class DeviceStatusesController(IMediator mediator) : ControllerBase
     {
         [HttpGet]

@@ -47,8 +47,8 @@ namespace SmartGrid.Application.Features.Users.Command
 
                 var token = jwtService.GenerateToken(user);
 
-                var frontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URL") ?? "http://localhost:5173/";
-                var link = $"{frontendUrl}set-password?token={activation.Token.Value}";
+                var frontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URL");
+                var link = $"{frontendUrl}activate?token={activation.Token.Value}";
 
                 await emailService.SendPasswordResetEmailAsync(user.Email, "Reset your SmartGrid password", link, ct);
                 return Result<AuthResponse>.Success(new AuthResponse(token, DateTime.UtcNow.AddHours(2)));

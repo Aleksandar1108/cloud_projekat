@@ -21,8 +21,7 @@ namespace SmartGrid.Application.Features.DeviceStatuses.Mappers
                 source.IsOverloaded,
                 source.CurrentFirmwareVersion.Value,
                 source.TargetFirmwareVersion?.Value,
-                source.UpdateStatus,
-                Label: null
+                source.UpdateStatus
             );
         }
     }

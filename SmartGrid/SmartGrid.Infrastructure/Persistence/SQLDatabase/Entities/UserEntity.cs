@@ -13,7 +13,5 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Entities
         public DateTime AccountCreated { get; set; }
 
         public bool IsActive { get; set; }
-
-        public bool IsSuspended { get; set; }
     }
 }

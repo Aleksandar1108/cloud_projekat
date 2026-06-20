@@ -1,7 +1,5 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SmartGrid.WebApi.Authorization;
 using SmartGrid.WebApi.DTOs;
 using SmartGrid.WebApi.Extensions;
 
@@ -9,7 +7,6 @@ namespace SmartGrid.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = Roles.SysAdmin)]
     public class FirmwaresController(IMediator mediator) : ControllerBase
     {
         [HttpPost("upload")]

@@ -26,8 +26,7 @@ namespace SmartGrid.Application.Features.Users.Queries
                 Email = user.Email.Value,
                 Role = user.Role.ToString(),
                 CreatedAt = user.AccountCreated.ToString("yyyy-MM-dd"),
-                IsActivated = user.ActivationStatus.Value,
-                IsSuspended = user.IsSuspended
+                IsActivated = user.ActivationStatus.Value
             }).ToList();
 
             return Result<IEnumerable<UserDTO>>

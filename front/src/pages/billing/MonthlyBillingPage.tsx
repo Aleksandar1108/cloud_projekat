@@ -1,82 +1,45 @@
 import { Navigate, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../hooks/auth/useAuthHook";
-import { getMonthlyBilling, runMonthlyBilling, getBillingStats } from "../../api_services/billing/BillingAPIService";
+import { getMonthlyBilling } from "../../api_services/billing/BillingAPIService";
 import { createCheckoutSession } from "../../api_services/payments/PaymentsAPIService";
 import type { MonthlyBill } from "../../types/billing/MonthlyBill";
-import type { BillingStats } from "../../types/billing/BillingStats";
-import { ERoles } from "../../enums/user/UserRole";
 
 function MonthlyBillingPage() {
     const navigate = useNavigate();
-    const { isAuthenticated, user } = useAuth();
+    const { isAuthenticated } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [isPaying, setIsPaying] = useState(false);
-    const [isRunning, setIsRunning] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [message, setMessage] = useState<string | null>(null);
     const [filter, setFilter] = useState("");
     const [draftFilter, setDraftFilter] = useState("");
     const [bills, setBills] = useState<MonthlyBill[]>([]);
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-    const now = new Date();
-    const [year, setYear] = useState<number>(now.getUTCFullYear());
-    const [month, setMonth] = useState<number>(now.getUTCMonth() + 1);
-
-    const [stats, setStats] = useState<BillingStats | null>(null);
-
-    const isBillingAdmin = user?.role === ERoles.Admin || user?.role === ERoles.SysAdmin;
+    const defaultPeriod = useMemo(() => {
+        const now = new Date();
+        return {
+            year: now.getUTCFullYear(),
+            month: now.getUTCMonth() + 1
+        };
+    }, []);
 
     if (!isAuthenticated) {
         return <Navigate to="/login" />;
     }
-
-    const loadStats = async () => {
-        if (!isBillingAdmin) return;
-        try {
-            const data = await getBillingStats(year, month);
-            setStats(data);
-        } catch {
-            setStats(null);
-        }
-    };
 
     const handleLoadBilling = async () => {
         setIsLoading(true);
         setError(null);
 
         try {
-            const response = await getMonthlyBilling(year, month);
+            const response = await getMonthlyBilling(defaultPeriod.year, defaultPeriod.month);
             setBills(response);
             setSelectedIndex(response.length > 0 ? 0 : null);
-            await loadStats();
         } catch (err) {
             setError(err instanceof Error ? err.message : "Neuspesno pokretanje mesecnog obracuna.");
         } finally {
             setIsLoading(false);
-        }
-    };
-
-    const handleRunBilling = async () => {
-        setIsRunning(true);
-        setError(null);
-        setMessage(null);
-
-        try {
-            const response = await runMonthlyBilling(year, month);
-            setBills(response);
-            setSelectedIndex(response.length > 0 ? 0 : null);
-            setMessage(
-                response.length > 0
-                    ? `Obracun zavrsen. Generisano racuna: ${response.length}.`
-                    : "Obracun zavrsen, ali nema potrosnje za izabrani period."
-            );
-            await loadStats();
-        } catch (err) {
-            setError(err instanceof Error ? err.message : "Neuspesno pokretanje obracuna.");
-        } finally {
-            setIsRunning(false);
         }
     };
 
@@ -106,7 +69,6 @@ function MonthlyBillingPage() {
 
     useEffect(() => {
         void handleLoadBilling();
-        void loadStats();
         // Load monthly billing view immediately; generation is done by backend schedule.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -143,27 +105,6 @@ function MonthlyBillingPage() {
                 </div>
             </section>
 
-            {isBillingAdmin && stats && (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px", marginBottom: "12px" }}>
-                    <article style={{ border: "1px solid #e5e7eb", borderRadius: "10px", padding: "10px", textAlign: "left", background: "#f8fafc" }}>
-                        <p style={{ fontSize: "13px", color: "#6b7280", margin: 0 }}>Generisano racuna</p>
-                        <h3 style={{ margin: "4px 0" }}>{stats.billCount}</h3>
-                    </article>
-                    <article style={{ border: "1px solid #e5e7eb", borderRadius: "10px", padding: "10px", textAlign: "left", background: "#f8fafc" }}>
-                        <p style={{ fontSize: "13px", color: "#6b7280", margin: 0 }}>Ukupan iznos</p>
-                        <h3 style={{ margin: "4px 0" }}>{stats.totalAmount.toFixed(2)} RSD</h3>
-                    </article>
-                    <article style={{ border: "1px solid #e5e7eb", borderRadius: "10px", padding: "10px", textAlign: "left", background: "#f0fdf4" }}>
-                        <p style={{ fontSize: "13px", color: "#6b7280", margin: 0 }}>Placeno</p>
-                        <h3 style={{ margin: "4px 0", color: "#16a34a" }}>{stats.paidCount} ({stats.paidAmount.toFixed(2)} RSD)</h3>
-                    </article>
-                    <article style={{ border: "1px solid #e5e7eb", borderRadius: "10px", padding: "10px", textAlign: "left", background: "#fef2f2" }}>
-                        <p style={{ fontSize: "13px", color: "#6b7280", margin: 0 }}>Neplaceno</p>
-                        <h3 style={{ margin: "4px 0", color: "#dc2626" }}>{stats.unpaidCount} ({stats.unpaidAmount.toFixed(2)} RSD)</h3>
-                    </article>
-                </div>
-            )}
-
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", marginBottom: "12px" }}>
                 <article style={{ border: "1px solid #e5e7eb", borderRadius: "10px", padding: "10px", textAlign: "left" }}>
                     <p style={{ fontSize: "13px", color: "#6b7280" }}>Broj racuna</p>
@@ -178,47 +119,6 @@ function MonthlyBillingPage() {
                     <h3 style={{ margin: "4px 0" }}>{filteredBills.length > 0 ? `${totalAmount.toFixed(2)} RSD` : "0 RSD"}</h3>
                 </article>
             </div>
-
-            <section style={{ display: "flex", gap: "8px", marginBottom: "12px", alignItems: "flex-end", flexWrap: "wrap" }}>
-                <label style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: "13px", color: "#374151" }}>
-                    Godina
-                    <input
-                        type="number"
-                        value={year}
-                        onChange={(e) => setYear(Number(e.target.value))}
-                        style={{ border: "1px solid #d1d5db", borderRadius: "8px", padding: "8px 10px", width: "110px" }}
-                    />
-                </label>
-                <label style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: "13px", color: "#374151" }}>
-                    Mesec
-                    <input
-                        type="number"
-                        min={1}
-                        max={12}
-                        value={month}
-                        onChange={(e) => setMonth(Number(e.target.value))}
-                        style={{ border: "1px solid #d1d5db", borderRadius: "8px", padding: "8px 10px", width: "90px" }}
-                    />
-                </label>
-                <button
-                    onClick={handleLoadBilling}
-                    disabled={isLoading}
-                    style={{ border: "1px solid #d1d5db", borderRadius: "8px", padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}
-                >
-                    {isLoading ? "Ucitavanje..." : "Ucitaj"}
-                </button>
-                {isBillingAdmin && (
-                    <button
-                        onClick={handleRunBilling}
-                        disabled={isRunning}
-                        style={{ backgroundColor: "#7c3aed", color: "white", border: "none", borderRadius: "8px", padding: "10px 14px", cursor: isRunning ? "not-allowed" : "pointer", fontWeight: 800 }}
-                    >
-                        {isRunning ? "Obracun u toku..." : "Pokreni obracun"}
-                    </button>
-                )}
-            </section>
-
-            {message && <p style={{ color: "#16a34a", marginBottom: "10px" }}>{message}</p>}
 
             <section style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
                 <input

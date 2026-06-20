@@ -25,9 +25,6 @@ namespace SmartGrid.WebApi.Extensions
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
-                    // Keep JWT claim names as-is ("id", "role"); otherwise the default
-                    // inbound mapping renames "role" to a long URI and [Authorize(Roles=...)] fails.
-                    options.MapInboundClaims = false;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
@@ -37,12 +34,9 @@ namespace SmartGrid.WebApi.Extensions
                         ValidateAudience = true,
                         ValidAudience = "SmartGrid",
                         ValidateLifetime = true,
-                        NameClaimType = "id",
-                        RoleClaimType = "role"
+                        NameClaimType = "id"
                     };
                 });
-
-            services.AddAuthorization();
 
             // Controllers + JSON enums
             services.AddControllers()

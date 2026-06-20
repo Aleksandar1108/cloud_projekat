@@ -1,6 +1,6 @@
 namespace SmartGrid.Infrastructure.Common.Options
 {
-    public class SmtpOptions
+    internal class SmtpOptions
     {
         public string Host { get; init; } = string.Empty;
         public int Port { get; init; } = 587;

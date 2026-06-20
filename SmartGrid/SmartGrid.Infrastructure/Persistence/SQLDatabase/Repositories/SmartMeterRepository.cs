@@ -67,16 +67,6 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories
             return entities.Select(_mapper.ToDomain).Where(x => x is not null).Select(x => x!).ToList();
         }
 
-        public async Task<IReadOnlyCollection<SmartMeter>> GetAllAsync(CancellationToken ct = default)
-        {
-            var entities = await _context.SmartMeters
-                .AsNoTracking()
-                .OrderBy(x => x.CreatedAt)
-                .ToListAsync(ct);
-
-            return entities.Select(_mapper.ToDomain).Where(x => x is not null).Select(x => x!).ToList();
-        }
-
         public async Task AddAsync(SmartMeter smartMeter, CancellationToken ct = default)
         {
             var entity = _mapper.ToEntity(smartMeter);
@@ -109,11 +99,6 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories
 
             _context.SmartMeters.Remove(entity);
             await _context.SaveChangesAsync(ct);
-        }
-
-        public Task<SmartMeter?> GetByDeviceUuidAsync(string deviceUuid, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
         }
     }
 }

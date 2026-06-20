@@ -1,12 +1,8 @@
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SmartGrid.Application.Common;
 using SmartGrid.Application.Features.ManualReadings.Commands;
 using SmartGrid.Application.Features.ManualReadings.Queries;
-using SmartGrid.Application.Interfaces.Storage;
 using SmartGrid.Domain.Enums;
-using SmartGrid.WebApi.Authorization;
 using SmartGrid.WebApi.DTOs;
 using SmartGrid.WebApi.Extensions;
 
@@ -14,10 +10,7 @@ namespace SmartGrid.WebApi.Controllers
 {
     [Route("api/manual-readings")]
     [ApiController]
-    [Authorize]
-    public class ManualReadingsController(
-        IMediator mediator,
-        IManualReadingImageStorage imageStorage) : ControllerBase
+    public class ManualReadingsController(IMediator mediator) : ControllerBase
     {
         [HttpPost]
         [Consumes("multipart/form-data")]
@@ -40,7 +33,6 @@ namespace SmartGrid.WebApi.Controllers
             return result.ToActionResult();
         }
 
-        [Authorize(Roles = Roles.AnyAdmin)]
         [HttpGet]
         public async Task<IActionResult> List([FromQuery] string? status)
         {
@@ -55,32 +47,11 @@ namespace SmartGrid.WebApi.Controllers
             return result.ToActionResult();
         }
 
-        [Authorize(Roles = Roles.AnyAdmin)]
         [HttpPost("{id:guid}/approve")]
         public async Task<IActionResult> Approve(Guid id)
         {
             var result = await mediator.Send(new ApproveManualReadingCommand(id));
             return result.ToActionResult();
-        }
-
-        [Authorize(Roles = Roles.AnyAdmin)]
-        [HttpGet("{id:guid}/image")]
-        public async Task<IActionResult> GetImage(Guid id, CancellationToken ct)
-        {
-            var metadata = new ManualReadingImageMetadata
-            {
-                ReadingId = id,
-                Variant = "optimized",
-                FileExtension = "jpg"
-            };
-
-            if (!await imageStorage.ExistsAsync(metadata, ct))
-            {
-                return NotFound();
-            }
-
-            var bytes = await imageStorage.ReadAsync(metadata, ct);
-            return File(bytes, "image/jpeg");
         }
     }
 }
