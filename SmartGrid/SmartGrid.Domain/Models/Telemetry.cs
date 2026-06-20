@@ -9,13 +9,15 @@ namespace SmartGrid.Domain.Models
         public EntityId Id { get; private set; }
         public EntityId DeviceId { get; private set; }
         public string DeviceName { get; private set; } = string.Empty;
-        public DeviceType DeviceType { get; private set; } = DeviceType.Unknown;
+        public DeviceType DeviceType { get; private set; } = DeviceType.Monofazni;
         public FirmwareVersion FirmwareVersion { get; private set; }
         public Power NominalPower { get; private set; }
         public Power CurrentPower { get; private set; }
         public DateTime Timestamp { get; private set; }
         public Percentage LoadPercentage { get; private set; }
         public double? Voltage { get; private set; }
+
+        public double TotalConsumption { get; private set; }
 
         private Telemetry(
             EntityId id,
@@ -26,7 +28,8 @@ namespace SmartGrid.Domain.Models
             Power currentPower,
             DateTime timestamp,
             FirmwareVersion firmwareVersion,
-            double? voltage)
+            double? voltage,
+            double totalConsumption)
         {
             Id = id;
             DeviceId = deviceId;
@@ -37,8 +40,13 @@ namespace SmartGrid.Domain.Models
             Timestamp = timestamp;
             FirmwareVersion = firmwareVersion;
             Voltage = voltage;
+            TotalConsumption = totalConsumption;
+
             LoadPercentage = nominalPower.Value > 0
-                ? Percentage.FromRaw(Math.Round((currentPower.Value / nominalPower.Value) * 100, 2))
+                ? Percentage.FromRaw(
+                    Math.Round(
+                        (currentPower.Value / nominalPower.Value) * 100,
+                        2))
                 : Percentage.Zero();
         }
 
@@ -52,56 +60,77 @@ namespace SmartGrid.Domain.Models
             double currentPower,
             DateTime timestamp,
             string firmwareVersion,
-            double? voltage = null)
+            double? voltage = null,
+            double totalConsumption = 0)
         {
             if (string.IsNullOrWhiteSpace(deviceName))
-                return Result<Telemetry>.Failure("DeviceName is required.",
+                return Result<Telemetry>.Failure(
+                    "DeviceName is required.",
                     ErrorType.Validation);
 
-            if (!Enum.IsDefined(typeof(DeviceType), deviceType)
-                || deviceType == DeviceType.Unknown)
-                return Result<Telemetry>.Failure("A valid and defined DeviceType must be specified.",
+            if (!Enum.IsDefined(typeof(DeviceType), deviceType))
+                return Result<Telemetry>.Failure(
+                    "A valid and defined DeviceType must be specified.",
                     ErrorType.Validation);
 
             if (timestamp > DateTime.UtcNow)
-                return Result<Telemetry>.Failure("Timestamp cannot be in the future.",
+                return Result<Telemetry>.Failure(
+                    "Timestamp cannot be in the future.",
+                    ErrorType.Validation);
+
+            if (totalConsumption < 0)
+                return Result<Telemetry>.Failure(
+                    "Total consumption cannot be negative.",
                     ErrorType.Validation);
 
             var idResult = EntityId.Create(deviceId);
 
             if (idResult.IsFailure)
-                return Result<Telemetry>.Failure(idResult.Error!.Message, ErrorType.Validation);
+                return Result<Telemetry>.Failure(
+                    idResult.Error!.Message,
+                    ErrorType.Validation);
 
             var nominalPowerResult = Power.Create(nominalPower);
 
             if (nominalPowerResult.IsFailure)
-                return Result<Telemetry>.Failure(nominalPowerResult.Error!.Message, ErrorType.Validation);
+                return Result<Telemetry>.Failure(
+                    nominalPowerResult.Error!.Message,
+                    ErrorType.Validation);
 
             var currentPowerResult = Power.Create(currentPower);
 
             if (currentPowerResult.IsFailure)
-                return Result<Telemetry>.Failure(currentPowerResult.Error!.Message, ErrorType.Validation);
+                return Result<Telemetry>.Failure(
+                    currentPowerResult.Error!.Message,
+                    ErrorType.Validation);
 
-            var firmwareVersionResult = FirmwareVersion.Create(firmwareVersion);
+            var firmwareVersionResult =
+                FirmwareVersion.Create(firmwareVersion);
 
             if (firmwareVersionResult.IsFailure)
-                return Result<Telemetry>.Failure(firmwareVersionResult.Error!.Message, ErrorType.Validation);
+                return Result<Telemetry>.Failure(
+                    firmwareVersionResult.Error!.Message,
+                    ErrorType.Validation);
 
             if (voltage is < 0)
-                return Result<Telemetry>.Failure("Voltage cannot be negative.", ErrorType.Validation);
+                return Result<Telemetry>.Failure(
+                    "Voltage cannot be negative.",
+                    ErrorType.Validation);
 
-            return Result<Telemetry>.Success(new Telemetry(
-                EntityId.New(),
-                idResult.Value,
-                deviceName,
-                deviceType,
-                nominalPowerResult.Value,
-                currentPowerResult.Value,
-                timestamp,
-                firmwareVersionResult.Value,
-                voltage
-            ));
+            return Result<Telemetry>.Success(
+                new Telemetry(
+                    EntityId.New(),
+                    idResult.Value,
+                    deviceName,
+                    deviceType,
+                    nominalPowerResult.Value,
+                    currentPowerResult.Value,
+                    timestamp,
+                    firmwareVersionResult.Value,
+                    voltage,
+                    totalConsumption));
         }
+
         public static Result<Telemetry> Load(
             string id,
             string deviceId,
@@ -111,27 +140,49 @@ namespace SmartGrid.Domain.Models
             double currentPower,
             DateTime timestamp,
             string firmwareVersion,
-            double? voltage = null)
+            double? voltage = null,
+            double totalConsumption = 0)
         {
             var idResult = EntityId.Create(id);
+
             if (idResult.IsFailure)
-                return Result<Telemetry>.Failure(idResult.Error!.Message, ErrorType.Validation);
+                return Result<Telemetry>.Failure(
+                    idResult.Error!.Message,
+                    ErrorType.Validation);
 
             var deviceIdResult = EntityId.Create(deviceId);
+
             if (deviceIdResult.IsFailure)
-                return Result<Telemetry>.Failure(deviceIdResult.Error!.Message, ErrorType.Validation);
+                return Result<Telemetry>.Failure(
+                    deviceIdResult.Error!.Message,
+                    ErrorType.Validation);
 
             var nominalPowerResult = Power.Create(nominalPower);
+
             if (nominalPowerResult.IsFailure)
-                return Result<Telemetry>.Failure(nominalPowerResult.Error!.Message, ErrorType.Validation);
+                return Result<Telemetry>.Failure(
+                    nominalPowerResult.Error!.Message,
+                    ErrorType.Validation);
 
             var currentPowerResult = Power.Create(currentPower);
-            if (currentPowerResult.IsFailure)
-                return Result<Telemetry>.Failure(currentPowerResult.Error!.Message, ErrorType.Validation);
 
-            var firmwareResult = FirmwareVersion.Create(firmwareVersion);
+            if (currentPowerResult.IsFailure)
+                return Result<Telemetry>.Failure(
+                    currentPowerResult.Error!.Message,
+                    ErrorType.Validation);
+
+            var firmwareResult =
+                FirmwareVersion.Create(firmwareVersion);
+
             if (firmwareResult.IsFailure)
-                return Result<Telemetry>.Failure(firmwareResult.Error!.Message, ErrorType.Validation);
+                return Result<Telemetry>.Failure(
+                    firmwareResult.Error!.Message,
+                    ErrorType.Validation);
+
+            if (totalConsumption < 0)
+                return Result<Telemetry>.Failure(
+                    "Total consumption cannot be negative.",
+                    ErrorType.Validation);
 
             var telemetry = new Telemetry(
                 idResult.Value,
@@ -142,7 +193,8 @@ namespace SmartGrid.Domain.Models
                 currentPowerResult.Value,
                 timestamp,
                 firmwareResult.Value,
-                voltage);
+                voltage,
+                totalConsumption);
 
             return Result<Telemetry>.Success(telemetry);
         }

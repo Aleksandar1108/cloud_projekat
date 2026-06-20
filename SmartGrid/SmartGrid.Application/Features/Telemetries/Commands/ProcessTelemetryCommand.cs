@@ -21,6 +21,7 @@ namespace SmartGrid.Application.Features.Telemetries.Commands
         public string FirmwareVersion { get; init; } = string.Empty;
         public DateTime Timestamp { get; init; }
         public double? Voltage { get; init; }
+        public double TotalConsumption { get; init; }
     }
 
     // VALIDATOR
@@ -29,28 +30,44 @@ namespace SmartGrid.Application.Features.Telemetries.Commands
         public ProcessTelemetryValidator()
         {
             RuleFor(t => t.DeviceId)
-                .NotEmpty().WithMessage("DeviceId is required.");
+                .NotEmpty()
+                .WithMessage("DeviceId is required.");
 
             RuleFor(t => t.DeviceName)
-                .NotEmpty().WithMessage("DeviceName is required.");
+                .NotEmpty()
+                .WithMessage("DeviceName is required.");
 
             RuleFor(t => t.FirmwareVersion)
                 .IsValidFirmwareVersion();
 
             RuleFor(t => t.DeviceType)
-                 .IsValidDeviceType();
+                .IsValidDeviceType();
 
             RuleFor(t => t.NominalPower)
-                .NotEmpty().WithMessage("NominalPower is missing from payload.")
-                .GreaterThan(0).WithMessage("NominalPower must be greater than zero.");
+                .NotEmpty()
+                .WithMessage("NominalPower is missing from payload.")
+                .GreaterThan(0)
+                .WithMessage("NominalPower must be greater than zero.");
 
             RuleFor(t => t.CurrentPower)
-                .NotEmpty().WithMessage("CurrentPower is missing from payload.")
+                .NotEmpty()
+                .WithMessage("CurrentPower is missing from payload.")
                 .GreaterThanOrEqualTo(0);
 
             RuleFor(t => t.Timestamp)
-                .NotEmpty().WithMessage("Timestamp is required.")
-                .LessThanOrEqualTo(DateTime.UtcNow).WithMessage("Timestamp cannot be in the future.");
+                .NotEmpty()
+                .WithMessage("Timestamp is required.")
+                .LessThanOrEqualTo(DateTime.UtcNow)
+                .WithMessage("Timestamp cannot be in the future.");
+
+            RuleFor(t => t.TotalConsumption)
+                .GreaterThanOrEqualTo(0)
+                .WithMessage("TotalConsumption cannot be negative.");
+
+            RuleFor(t => t.Voltage)
+                .GreaterThanOrEqualTo(0)
+                .When(t => t.Voltage.HasValue)
+                .WithMessage("Voltage cannot be negative.");
         }
     }
 
@@ -58,9 +75,12 @@ namespace SmartGrid.Application.Features.Telemetries.Commands
     internal class ProcessTelemetryHandler(
         ITelemetryRepository telemetryRepository,
         IMediator mediator,
-        ILogger<ProcessTelemetryHandler> logger) : IRequestHandler<ProcessTelemetryCommand, Result>
+        ILogger<ProcessTelemetryHandler> logger)
+        : IRequestHandler<ProcessTelemetryCommand, Result>
     {
-        public async Task<Result> Handle(ProcessTelemetryCommand request, CancellationToken ct)
+        public async Task<Result> Handle(
+            ProcessTelemetryCommand request,
+            CancellationToken ct)
         {
             var telemetryResult = Telemetry.Create(
                 request.DeviceId,
@@ -70,19 +90,26 @@ namespace SmartGrid.Application.Features.Telemetries.Commands
                 request.CurrentPower,
                 request.Timestamp,
                 request.FirmwareVersion,
-                request.Voltage
+                request.Voltage,
+                request.TotalConsumption
             );
 
             if (telemetryResult.IsFailure)
-                return Result.Failure(telemetryResult.Error!.Message, ErrorType.Validation);
+            {
+                return Result.Failure(
+                    telemetryResult.Error!.Message,
+                    ErrorType.Validation);
+            }
 
             var telemetry = telemetryResult.Value;
 
             await telemetryRepository.SaveAsync(telemetry, ct);
 
-            await mediator.Publish(new TelemetryProcessedEvent(telemetry), ct);
+            //TODO popraviti
+            //await mediator.Publish( new TelemetryProcessedEvent(telemetry), ct);
 
-            logger.LogInformation("[TELEMETRY] Telemetry data successfully saved and event published for Device: {DeviceId}",
+            logger.LogInformation(
+                "[TELEMETRY] Telemetry data successfully saved and event published for Device: {DeviceId}",
                 telemetry.DeviceId);
 
             return Result.Success();

@@ -8,6 +8,8 @@
         public double CurrentPower { get; set; }
         public double Load { get; set; }
         public string FirmwareVersion { get; set; } = default!;
+        public double TotalConsumption { get; set; }
+
         public DateTime ObservationTime { get; set; }
         public double? Voltage { get; set; }
     }

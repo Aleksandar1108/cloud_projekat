@@ -8,7 +8,7 @@ namespace SmartGrid.Domain.Models
     public class DeviceStatus
     {
         public EntityId DeviceId { get; private set; }
-        public DeviceType DeviceType { get; private set; } = DeviceType.Unknown;
+        public DeviceType DeviceType { get; private set; } = DeviceType.Monofazni;
 
         // SNAPSHOT
         public Power CurrentPower { get; private set; }

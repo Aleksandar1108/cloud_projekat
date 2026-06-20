@@ -18,7 +18,8 @@ namespace SmartGrid.Infrastructure.Persistence.AzureTable.Mappers
                 CurrentPower = domain.CurrentPower.Value,
                 NominalPower = domain.NominalPower.Value,
                 FirmwareVersion = domain.FirmwareVersion.Value,
-                Voltage = domain.Voltage
+                Voltage = domain.Voltage,
+                TotalConsumption = domain.TotalConsumption,
             };
         }
 
@@ -26,7 +27,7 @@ namespace SmartGrid.Infrastructure.Persistence.AzureTable.Mappers
         {
             var type = Enum.TryParse<DeviceType>(entity.PartitionKey, out var parsedType)
                 ? parsedType
-                : DeviceType.Unknown;
+                : DeviceType.Monofazni;
 
             var parts = entity.RowKey.Split('_');
             var telemetryId = parts.Length > 1 ? parts[1] : entity.RowKey;
@@ -40,7 +41,8 @@ namespace SmartGrid.Infrastructure.Persistence.AzureTable.Mappers
                 entity.CurrentPower,
                 entity.ObservationTime,
                 entity.FirmwareVersion,
-                entity.Voltage
+                entity.Voltage,
+                entity.TotalConsumption
             );
 
             if (telemetryResult.IsFailure)

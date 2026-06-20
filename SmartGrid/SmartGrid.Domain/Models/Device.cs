@@ -43,7 +43,7 @@ namespace SmartGrid.Domain.Models
             string location,
             DateTime registeredAt)
         {
-            if (!Enum.IsDefined(typeof(DeviceType), type) || type == DeviceType.Unknown)
+            if (!Enum.IsDefined(typeof(DeviceType), type))
                 return Result<Device>.Failure("Invalid Device Type.", ErrorType.Validation);
 
             if (string.IsNullOrWhiteSpace(name))

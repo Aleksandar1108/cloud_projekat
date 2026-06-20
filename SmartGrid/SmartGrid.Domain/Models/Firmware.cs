@@ -7,7 +7,7 @@ namespace SmartGrid.Domain.Models
     public class Firmware
     {
         public EntityId Id { get; private set; }
-        public DeviceType DeviceType { get; private set; } = DeviceType.Unknown;
+        public DeviceType DeviceType { get; private set; } = DeviceType.Monofazni;
         public FirmwareVersion Version { get; private set; }
 
         public FirmwareFileName FileName { get; private set; }
@@ -41,7 +41,7 @@ namespace SmartGrid.Domain.Models
             DateTime uploadedAt
         )
         {
-            if (!Enum.IsDefined(typeof(DeviceType), deviceType) || deviceType == DeviceType.Unknown)
+            if (!Enum.IsDefined(typeof(DeviceType), deviceType))
                 return Result<Firmware>.Failure("A valid and defined DeviceType must be specified.",
                     ErrorType.Validation);
 

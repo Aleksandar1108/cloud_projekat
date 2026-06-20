@@ -7,9 +7,7 @@ namespace SmartGrid.Application.Common.Validators
     {
         public static IRuleBuilderOptions<T, DeviceType> IsValidDeviceType<T>(this IRuleBuilder<T, DeviceType> ruleBuilder)
         {
-            return ruleBuilder
-                            .IsInEnum().WithMessage("Invalid device type.")
-                            .NotEqual(DeviceType.Unknown).WithMessage("DeviceType cannot be Unknown.");
+            return ruleBuilder.IsInEnum().WithMessage("Invalid device type.");
         }
 
         public static IRuleBuilderOptions<T, string> IsValidFirmwareVersion<T>(this IRuleBuilder<T, string> ruleBuilder)

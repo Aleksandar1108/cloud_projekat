@@ -16,7 +16,7 @@ namespace SmartGrid.Application.Features.Firmwares.Commands
     public record UploadFirmwareCommand : IRequest<Result>
     {
         public UploadedFirmwareFile FirmwareFile { get; init; } = new();
-        public DeviceType DeviceType { get; init; } = DeviceType.Unknown;
+        public DeviceType DeviceType { get; init; } = DeviceType.Monofazni;
         public string Version { get; init; } = string.Empty;
     }
 

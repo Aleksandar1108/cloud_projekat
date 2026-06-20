@@ -21,7 +21,7 @@ namespace SmartGrid.Infrastructure.Persistence.AzureTable.Mappers
         {
             var type = Enum.TryParse<DeviceType>(entity.PartitionKey, out var parsedType)
                ? parsedType
-               : DeviceType.Unknown;
+               : DeviceType.Monofazni;
 
             var firmwareResult = Firmware.Load(
                 entity.RowKey,

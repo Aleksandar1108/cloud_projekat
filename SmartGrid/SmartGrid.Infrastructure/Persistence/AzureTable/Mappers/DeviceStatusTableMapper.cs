@@ -22,7 +22,7 @@ namespace SmartGrid.Infrastructure.Persistence.AzureTable.Mappers
         public DeviceStatus? ToDomain(DeviceStatusEntity entity)
         {
             var deviceType = Enum.TryParse<DeviceType>(entity.PartitionKey, out var parsedType)
-                             ? parsedType : DeviceType.Unknown;
+                             ? parsedType : DeviceType.Monofazni;
 
             var updateStatus = Enum.TryParse<UpdateStatus>(entity.UpdateStatus, out var parsedStatus)
                                ? parsedStatus : UpdateStatus.UpToDate;

@@ -1,18 +1,18 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using SmartGrid.Application.Features.Devices.Queries;
+using SmartGrid.Application.Features.SmartMeters.Queries;
 using SmartGrid.WebApi.Extensions;
 
 namespace SmartGrid.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DevicesController(IMediator mediator) : ControllerBase
+    public class SmartMetersController(IMediator mediator) : ControllerBase
     {
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var result = await mediator.Send(new GetDevicesQuery());
+            var result = await mediator.Send(new GetAllSmartMetersQuery());
 
             if (result is null)
             {
