@@ -243,11 +243,6 @@ csx/
 ecf/
 rcf/
 
-# Azurite local storage emulator
-__azurite_db_*.json
-__blobstorage__/
-AzuriteConfig/
-
 # Windows Store app package directories and files
 AppPackages/
 BundleArtifacts/

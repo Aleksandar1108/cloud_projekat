@@ -45,7 +45,7 @@ namespace SmartGrid.WebApi.BackgroundServices
                                                                deviceStatusDto,
                                                                stoppingToken);
 
-                        var linkedMeter = await smartMeterRepository.GetByDeviceUUIDAsync(deviceStatus.DeviceId.Value, stoppingToken);
+                        var linkedMeter = await smartMeterRepository.GetByDeviceUuidAsync(deviceStatus.DeviceId.Value, stoppingToken);
                         if (linkedMeter is not null)
                         {
                             await hubContext.Clients

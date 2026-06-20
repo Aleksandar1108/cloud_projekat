@@ -11,8 +11,7 @@ import {
     registerSerialNumber,
     getConsumptionLimit,
     setConsumptionLimit,
-    deleteConsumptionLimit,
-    activateSmartMeter
+    deleteConsumptionLimit
 } from "../../api_services/properties/PropertyAPIService";
 import type { Property, UpdatePropertyDto, PropertyType } from "../../types/property/Property";
 import type { SmartMeter, AddSmartMeterDto, ConnectionType } from "../../types/property/SmartMeter";
@@ -53,7 +52,6 @@ function PropertyDetailPage() {
 
     const [limitForms, setLimitForms] = useState<Record<string, { unit: ConsumptionLimitUnit; limitValue: string }>>({});
     const [limitSubmitting, setLimitSubmitting] = useState<string | null>(null);
-    const [activating, setActivating] = useState<string | null>(null);
 
     useEffect(() => {
         if (!isAuthenticated) { navigate("/login"); return; }
@@ -147,22 +145,6 @@ function PropertyDetailPage() {
             showSuccess("Brojilo je obrisano.");
         } catch {
             setError("Greška pri brisanju brojila.");
-        }
-    }
-
-    async function handleActivateMeter(meterId: string, serialNumber: string) {
-        setActivating(meterId);
-        setError(null);
-        try {
-            const deviceUUID = crypto.randomUUID();
-            await activateSmartMeter(serialNumber, deviceUUID);
-            setMeters(prev => prev.map(m => m.id === meterId ? { ...m, pairingStatus: "Paired", deviceUUID } : m));
-            showSuccess("Brojilo je uspešno upareno!");
-        } catch (err: unknown) {
-            const data = (err as { response?: { data?: { details?: string; message?: string } } })?.response?.data;
-            setError(data?.details ?? data?.message ?? "Greška pri aktivaciji brojila. Proverite da li su Azure Functions pokrenute (port 7139).");
-        } finally {
-            setActivating(null);
         }
     }
 
@@ -371,20 +353,6 @@ function PropertyDetailPage() {
                                                         {serialSubmitting === m.id ? "Čuvanje..." : "Registruj S/N"}
                                                     </button>
                                                 </div>
-                                                {m.serialNumber && (
-                                                    <div style={{ marginTop: "8px" }}>
-                                                        <button
-                                                            onClick={() => handleActivateMeter(m.id, m.serialNumber!)}
-                                                            disabled={activating === m.id}
-                                                            style={btnActivate}
-                                                        >
-                                                            {activating === m.id ? "Aktivacija..." : "Aktiviraj brojilo (test)"}
-                                                        </button>
-                                                        <span style={{ fontSize: "12px", color: "#888", marginLeft: "8px" }}>
-                                                            Simulira uparivanje fizičkog uređaja
-                                                        </span>
-                                                    </div>
-                                                )}
                                             </div>
                                         )}
 
@@ -452,7 +420,6 @@ function PropertyDetailPage() {
 const btnPrimary: React.CSSProperties = { backgroundColor: "var(--secondary, #2563eb)", color: "#fff", border: "none", padding: "8px 16px", borderRadius: "6px", cursor: "pointer", fontWeight: "bold", fontSize: "14px" };
 const btnSecondary: React.CSSProperties = { backgroundColor: "#6b7280", color: "#fff", border: "none", padding: "8px 16px", borderRadius: "6px", cursor: "pointer", fontWeight: "bold", fontSize: "14px" };
 const btnDanger: React.CSSProperties = { backgroundColor: "#dc2626", color: "#fff", border: "none", padding: "8px 16px", borderRadius: "6px", cursor: "pointer", fontWeight: "bold", fontSize: "14px" };
-const btnActivate: React.CSSProperties = { backgroundColor: "#16a34a", color: "#fff", border: "none", padding: "8px 16px", borderRadius: "6px", cursor: "pointer", fontWeight: "bold", fontSize: "14px" };
 const cardStyle: React.CSSProperties = { border: "1px solid #e5e7eb", borderRadius: "8px", padding: "16px", backgroundColor: "#fff" };
 const formStyle: React.CSSProperties = { border: "1px solid #e5e7eb", borderRadius: "8px", padding: "16px", backgroundColor: "#f9fafb", display: "flex", flexDirection: "column", gap: "8px", maxWidth: "440px" };
 const inputStyle: React.CSSProperties = { padding: "8px", borderRadius: "4px", border: "1px solid #d1d5db", fontSize: "14px", width: "100%", boxSizing: "border-box", color: "#111", backgroundColor: "#fff" };
