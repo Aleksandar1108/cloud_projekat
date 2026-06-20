@@ -16,6 +16,8 @@ namespace SmartGrid.ITSimulator.Services
             _maxPowerVariation = maxPowerVariation;
         }
 
+        private readonly Dictionary<string, DateTime> _lastTimestampByDevice = new();
+
         public TelemetryDTO GenerateTelemetry(
             string deviceId,
             string deviceName,
@@ -23,19 +25,8 @@ namespace SmartGrid.ITSimulator.Services
             string firmwareVersion,
             DeviceType deviceType)
         {
-            if (string.IsNullOrWhiteSpace(deviceId))
-                throw new ArgumentException( "Device Id cannot be empty", nameof(deviceId));
 
-            if (string.IsNullOrWhiteSpace(deviceName))
-                throw new ArgumentException("Device Name cannot be empty",nameof(deviceName));
-
-            if (string.IsNullOrWhiteSpace(firmwareVersion))
-                throw new ArgumentException("Firmware Version cannot be empty", nameof(firmwareVersion));
-
-            if (nominalPower <= 0)
-                throw new ArgumentException( "Nominal power must be greater than zero", nameof(nominalPower));
-
-            double currentPower = _random.NextDouble() *(nominalPower + _maxPowerVariation);
+            double currentPower = _random.NextDouble() * (nominalPower + _maxPowerVariation);
 
             currentPower = Math.Min(currentPower, nominalPower * 1.3);
 
@@ -54,10 +45,22 @@ namespace SmartGrid.ITSimulator.Services
                     _random.Next(1000, 5000);
             }
 
-
             double generatedConsumption = currentPower * (10.0 / 3600.0);
 
             _totalConsumptionByDevice[deviceId] += generatedConsumption;
+
+            DateTime timestamp;
+
+            if (!_lastTimestampByDevice.ContainsKey(deviceId))
+            {
+                timestamp = DateTime.UtcNow.AddDays(-5);
+            }
+            else
+            {
+                timestamp = _lastTimestampByDevice[deviceId].AddHours(2);
+            }
+
+            _lastTimestampByDevice[deviceId] = timestamp;
 
             return new TelemetryDTO
             {
@@ -67,9 +70,9 @@ namespace SmartGrid.ITSimulator.Services
                 NominalPower = nominalPower,
                 CurrentPower = currentPower,
                 FirmwareVersion = firmwareVersion,
-                Timestamp = DateTime.UtcNow,
+                Timestamp = timestamp,
                 Voltage = voltage,
-                TotalConsumption =  Math.Round( _totalConsumptionByDevice[deviceId], 3)
+                TotalConsumption = Math.Round(_totalConsumptionByDevice[deviceId], 3)
             };
         }
     }
