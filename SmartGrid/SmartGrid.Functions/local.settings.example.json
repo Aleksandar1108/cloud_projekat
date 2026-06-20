@@ -1,0 +1,42 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "AzureWebJobsSecretStorageType": "Files",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "AzureQueueOptions__ConnectionString": "UseDevelopmentStorage=true",
+    "AzureQueueOptions__DeviceStatusQueue": "device-status-queue",
+    "AzureQueueOptions__AlertQueue": "alert-queue",
+    "AzureTableOptions__ConnectionString": "UseDevelopmentStorage=true",
+    "AzureTableOptions__TelemetriesTable": "Telemetries",
+    "AzureTableOptions__DevicesTable": "Devices",
+    "AzureTableOptions__FirmwaresTable": "Firmwares",
+    "AzureTableOptions__DeviceStatusesTable": "DeviceStatuses",
+    "AzureTableOptions__MonthlyBillsTable": "MonthlyBills",
+    "AzureTableOptions__ManualReadingsTable": "ManualReadings",
+    "AzureTableOptions__ConsumptionLimitsTable": "ConsumptionLimits",
+    "AzureTableOptions__ConsumptionLimitNotifiedTable": "ConsumptionLimitNotified",
+    "AzureTableOptions__AlertDispatchStateTable": "AlertDispatchState",
+    "AzureTableOptions__TariffModelsTable": "TariffModels",
+    "AzureBlobOptions__ConnectionString": "UseDevelopmentStorage=true",
+    "AzureBlobOptions__FirmwareBlob": "firmware-updates",
+    "AzureBlobOptions__MonthlyBillsBlob": "monthly-bills",
+    "AzureBlobOptions__ManualReadingsBlob": "manual-readings",
+    "ParallelSettings__MaxDegreeOfParallelism": "20",
+    "SQLServer__Server": "localhost,1433",
+    "SQLServer__Database": "SmartGrid",
+    "SQLServer__Login": "sa",
+    "SQLServer__Password": "YOUR_SA_PASSWORD_HERE",
+    "AlertNotifications__NetworkAdminEmails": "",
+    "AlertNotifications__CriticalVoltageThresholdVolts": "190",
+    "AlertNotifications__OfflineThresholdMinutes": "35",
+    "AlertNotifications__VoltageAlertCooldownMinutes": "60",
+    "GridMonitorSchedule": "0 */5 * * * *",
+    "MonthlyBillingSchedule": "0 0 1 * * *",
+    "SmartMeterOfflineMonitorSchedule": "0 */10 * * * *"
+  },
+  "Host": {
+    "LocalHttpPort": 7139,
+    "CORS": "*"
+  }
+}
