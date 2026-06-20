@@ -103,26 +103,22 @@ public class SmartGridDbContext : DbContext
         modelBuilder.Entity<TariffModelEntity>(entity =>
         {
             entity.HasKey(e => e.Id);
-
-            entity.Property(e => e.Name)
-                  .IsRequired()
-                  .HasMaxLength(80);
-
-            entity.Property(e => e.IsActive)
-                  .IsRequired();
-
-            entity.Property(e => e.CreatedAt)
-                  .IsRequired();
-
-            entity.Property(e => e.GreenZoneVtPrice).IsRequired();
-            entity.Property(e => e.GreenZoneNtPrice).IsRequired();
-            entity.Property(e => e.BlueZoneVtPrice).IsRequired();
-            entity.Property(e => e.BlueZoneNtPrice).IsRequired();
-            entity.Property(e => e.RedZoneVtPrice).IsRequired();
-            entity.Property(e => e.RedZoneNtPrice).IsRequired();
-            entity.Property(e => e.NetworkCostPerKw).IsRequired();
-            entity.Property(e => e.SupplierCost).IsRequired();
-            entity.Property(e => e.ApprovedPowerKw).IsRequired();
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(80).HasColumnName("name");
+            entity.Property(e => e.IsActive).IsRequired().HasColumnName("isActive");
+            entity.Property(e => e.CreatedAt).IsRequired().HasColumnName("createdAt");
+            entity.Property(e => e.GreenZoneVtPrice).IsRequired().HasColumnName("greenZoneVtPrice");
+            entity.Property(e => e.GreenZoneNtPrice).IsRequired().HasColumnName("greenZoneNtPrice");
+            entity.Property(e => e.BlueZoneVtPrice).IsRequired().HasColumnName("blueZoneVtPrice");
+            entity.Property(e => e.BlueZoneNtPrice).IsRequired().HasColumnName("blueZoneNtPrice");
+            entity.Property(e => e.RedZoneVtPrice).IsRequired().HasColumnName("redZoneVtPrice");
+            entity.Property(e => e.RedZoneNtPrice).IsRequired().HasColumnName("redZoneNtPrice");
+            entity.Property(e => e.NetworkCostPerKw).IsRequired().HasColumnName("networkCostPerKw");
+            entity.Property(e => e.SupplierCost).IsRequired().HasColumnName("supplierCost");
+            entity.Property(e => e.ApprovedPowerKw).IsRequired().HasColumnName("approvedPowerKw");
+            entity.Property(e => e.GreenZoneMaxKwh).IsRequired().HasColumnName("greenZoneMaxKwh");
+            entity.Property(e => e.BlueZoneMaxKwh).IsRequired().HasColumnName("blueZoneMaxKwh");
+            entity.Property(e => e.UpdatedAt).IsRequired().HasColumnName("updatedAt");
         });
 
     }

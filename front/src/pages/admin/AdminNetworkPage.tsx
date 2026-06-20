@@ -18,9 +18,8 @@ import {
 } from "@mui/material";
 import AdminRoute from "../../components/admin/AdminRoute";
 import PageShell from "../../components/layout/PageShell";
-import MockDataBanner from "../../components/layout/MockDataBanner";
 import StatCard from "../../components/layout/StatCard";
-import { getMeterStatuses, getRealizedPayments } from "../../services/admin/AdminMockService";
+import { getMeterStatuses, getRealizedPayments } from "../../api_services/admin/AdminAPIService";
 import type { MeterNetworkStatus } from "../../types/admin/MeterNetworkStatus";
 import type { AdminPayment } from "../../types/admin/AdminPayment";
 
@@ -70,7 +69,6 @@ function AdminNetworkPageContent() {
             title="Status mreze i uplate"
             subtitle="Pregled online/offline statusa brojila i istorije realizovanih uplata."
             maxWidth="xl"
-            banner={<MockDataBanner message="Test podaci — prikazani su mock brojila i mock realizovane uplate." />}
         >
             {isLoading && (
                 <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>

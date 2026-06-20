@@ -35,6 +35,28 @@ namespace SmartGrid.Infrastructure.Persistence.AzureTable.Repositories
             var results = await base.QueryAsync(filter, ct);
             return results.OrderByDescending(x => x.CreatedAtUtc).FirstOrDefault();
         }
+
+        public async Task<IReadOnlyCollection<PaymentDto>> GetAllPaidAsync(CancellationToken ct = default)
+        {
+            try
+            {
+                var paidStatus = (int)PaymentStatus.Paid;
+                var filter = $"Status eq {paidStatus}";
+                var results = await base.QueryAsync(filter, ct);
+                return results
+                    .Where(x => x.Status == PaymentStatus.Paid && x.PaidAtUtc.HasValue)
+                    .OrderByDescending(x => x.PaidAtUtc)
+                    .ToList();
+            }
+            catch (RequestFailedException ex) when (ex.Status == 404)
+            {
+                return Array.Empty<PaymentDto>();
+            }
+            catch (Exception)
+            {
+                return Array.Empty<PaymentDto>();
+            }
+        }
     }
 }
 

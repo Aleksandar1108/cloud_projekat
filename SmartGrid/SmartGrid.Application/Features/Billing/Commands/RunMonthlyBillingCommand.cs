@@ -6,6 +6,7 @@ using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Application.Interfaces.Storage;
 using SmartGrid.Domain.Common;
 using SmartGrid.Domain.Enums;
+using System.Net;
 using System.Text;
 
 namespace SmartGrid.Application.Features.Billing.Commands
@@ -34,6 +35,8 @@ namespace SmartGrid.Application.Features.Billing.Commands
         ITariffModelRepository tariffModelRepository,
         IMonthlyBillRepository monthlyBillRepository,
         IMonthlyBillTextStorage monthlyBillTextStorage,
+        ISmartMeterRepository smartMeterRepository,
+        IPropertyRepository propertyRepository,
         IUserRepository userRepository,
         IEmailService emailService,
         ILogger<RunMonthlyBillingHandler> logger)
@@ -43,96 +46,125 @@ namespace SmartGrid.Application.Features.Billing.Commands
 
         public async Task<Result<IReadOnlyCollection<MonthlyBillDto>>> Handle(RunMonthlyBillingCommand request, CancellationToken ct)
         {
-            if (request.Month < 1 || request.Month > 12)
+            try
             {
-                return Result<IReadOnlyCollection<MonthlyBillDto>>.Failure("Month must be in [1..12].", ErrorType.Validation);
+                if (request.Month < 1 || request.Month > 12)
+                {
+                    return Result<IReadOnlyCollection<MonthlyBillDto>>.Failure("Month must be in [1..12].", ErrorType.Validation);
+                }
+
+                var periodStart = new DateTime(request.Year, request.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+                var periodEnd = periodStart.AddMonths(1);
+
+                var telemetry = await telemetryRepository.GetByPeriodAsync(periodStart, periodEnd, ct);
+                var processedManualReadings = await manualReadingRepository.GetProcessedByPeriodAsync(periodStart, periodEnd, ct);
+
+                if (telemetry.Count == 0 && processedManualReadings.Count == 0)
+                {
+                    return Result<IReadOnlyCollection<MonthlyBillDto>>.Failure(
+                        $"Nema telemetrije ni rucnih ocitavanja za period {request.Year:D4}-{request.Month:D2}. Pokreni simulator i obracunaj tekuci mesec.",
+                        ErrorType.Failure);
+                }
+
+                var tariffModel = await tariffModelRepository.GetActiveAsync(ct);
+                if (tariffModel is null)
+                {
+                    return Result<IReadOnlyCollection<MonthlyBillDto>>.Failure(
+                        "Nema aktivnog tarifnog modela u bazi. Pokreni seed-tariff-model.sql.",
+                        ErrorType.NotFound);
+                }
+
+                var bills = new List<MonthlyBillDto>();
+                var deviceIds = telemetry.Select(t => t.DeviceId.Value)
+                    .Concat(processedManualReadings.Select(m => m.DeviceId))
+                    .Distinct()
+                    .ToList();
+
+                foreach (var deviceId in deviceIds)
+                {
+                    var higherKwh = 0.0;
+                    var lowerKwh = 0.0;
+
+                    foreach (var sample in telemetry.Where(t => t.DeviceId.Value == deviceId))
+                    {
+                        var sampleKwh = sample.CurrentPower.Value * SampleIntervalHours;
+                        if (sample.Timestamp.Hour >= 7 && sample.Timestamp.Hour < 23)
+                        {
+                            higherKwh += sampleKwh;
+                        }
+                        else
+                        {
+                            lowerKwh += sampleKwh;
+                        }
+                    }
+
+                    var processedForDevice = processedManualReadings.Where(x => x.DeviceId == deviceId);
+                    foreach (var manual in processedForDevice)
+                    {
+                        if (manual.ReadingAtUtc.Hour >= 7 && manual.ReadingAtUtc.Hour < 23)
+                        {
+                            higherKwh += manual.ReadingKwh;
+                        }
+                        else
+                        {
+                            lowerKwh += manual.ReadingKwh;
+                        }
+                    }
+
+                    var bill = BuildBill(deviceId, request.Year, request.Month, higherKwh, lowerKwh, tariffModel);
+
+                    try
+                    {
+                        await monthlyBillTextStorage.SaveAsync(new FileData<MonthlyBillTextMetadata>
+                        {
+                            Content = GeneratePdfBytes(bill),
+                            Metadata = new MonthlyBillTextMetadata
+                            {
+                                Year = request.Year,
+                                Month = request.Month,
+                                DeviceId = deviceId
+                            }
+                        }, ct);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogWarning(ex, "PDF racuna nije sacuvan u blob storage za uredjaj {DeviceId}.", deviceId);
+                    }
+
+                    await monthlyBillRepository.SaveOrUpdateAsync(bill, ct);
+                    bills.Add(bill);
+                }
+
+                logger.LogInformation("Monthly billing generated for {Count} devices. Period: {Year}-{Month}.", bills.Count, request.Year, request.Month);
+
+                await SendMonthlyBillingEmailsAsync(
+                    request.Year,
+                    request.Month,
+                    bills,
+                    smartMeterRepository,
+                    propertyRepository,
+                    userRepository,
+                    emailService,
+                    logger,
+                    ct);
+
+                return Result<IReadOnlyCollection<MonthlyBillDto>>.Success(bills.OrderBy(b => b.DeviceId).ToList());
             }
-
-            var periodStart = new DateTime(request.Year, request.Month, 1, 0, 0, 0, DateTimeKind.Utc);
-            var periodEnd = periodStart.AddMonths(1);
-
-            var telemetry = await telemetryRepository.GetByPeriodAsync(periodStart, periodEnd, ct);
-            var processedManualReadings = await manualReadingRepository.GetProcessedByPeriodAsync(periodStart, periodEnd, ct);
-
-            if (telemetry.Count == 0 && processedManualReadings.Count == 0)
+            catch (Exception ex)
             {
-                return Result<IReadOnlyCollection<MonthlyBillDto>>.Success(Array.Empty<MonthlyBillDto>());
-            }
-
-            var tariffModel = await tariffModelRepository.GetActiveAsync(ct);
-            if (tariffModel is null)
-            {
+                logger.LogError(ex, "Monthly billing failed for {Year}-{Month}.", request.Year, request.Month);
                 return Result<IReadOnlyCollection<MonthlyBillDto>>.Failure(
-                    "No active tariff model found. Define and activate one in SQL.",
-                    ErrorType.NotFound);
+                    $"Mesecni obracun nije uspeo: {ex.Message}",
+                    ErrorType.Unexpected);
             }
-
-            var bills = new List<MonthlyBillDto>();
-            var deviceIds = telemetry.Select(t => t.DeviceId.Value)
-                .Concat(processedManualReadings.Select(m => m.DeviceId))
-                .Distinct()
-                .ToList();
-
-            foreach (var deviceId in deviceIds)
-            {
-                var higherKwh = 0.0;
-                var lowerKwh = 0.0;
-
-                foreach (var sample in telemetry.Where(t => t.DeviceId.Value == deviceId))
-                {
-                    var sampleKwh = sample.CurrentPower.Value * SampleIntervalHours;
-                    if (sample.Timestamp.Hour >= 7 && sample.Timestamp.Hour < 23)
-                    {
-                        higherKwh += sampleKwh;
-                    }
-                    else
-                    {
-                        lowerKwh += sampleKwh;
-                    }
-                }
-
-                var processedForDevice = processedManualReadings.Where(x => x.DeviceId == deviceId);
-                foreach (var manual in processedForDevice)
-                {
-                    if (manual.ReadingAtUtc.Hour >= 7 && manual.ReadingAtUtc.Hour < 23)
-                    {
-                        higherKwh += manual.ReadingKwh;
-                    }
-                    else
-                    {
-                        lowerKwh += manual.ReadingKwh;
-                    }
-                }
-
-                var bill = BuildBill(deviceId, request.Year, request.Month, higherKwh, lowerKwh, tariffModel);
-
-                await monthlyBillTextStorage.SaveAsync(new FileData<MonthlyBillTextMetadata>
-                {
-                    Content = GeneratePdfBytes(bill),
-                    Metadata = new MonthlyBillTextMetadata
-                    {
-                        Year = request.Year,
-                        Month = request.Month,
-                        DeviceId = deviceId
-                    }
-                }, ct);
-
-                await monthlyBillRepository.SaveOrUpdateAsync(bill, ct);
-
-                bills.Add(bill);
-            }
-
-            logger.LogInformation("Monthly billing generated for {Count} devices. Period: {Year}-{Month}.", bills.Count, request.Year, request.Month);
-
-            await SendMonthlyBillingEmailSummaryAsync(request.Year, request.Month, bills, userRepository, emailService, logger, ct);
-
-            return Result<IReadOnlyCollection<MonthlyBillDto>>.Success(bills.OrderBy(b => b.DeviceId).ToList());
         }
 
-        private static async Task SendMonthlyBillingEmailSummaryAsync(
+        private static async Task SendMonthlyBillingEmailsAsync(
             int year,
             int month,
             IReadOnlyCollection<MonthlyBillDto> bills,
+            ISmartMeterRepository smartMeterRepository,
+            IPropertyRepository propertyRepository,
             IUserRepository userRepository,
             IEmailService emailService,
             ILogger<RunMonthlyBillingHandler> logger,
@@ -140,39 +172,58 @@ namespace SmartGrid.Application.Features.Billing.Commands
         {
             try
             {
-                var users = await userRepository.GetAllAsync(ct);
-                var recipients = users
-                    .Where(u => u.Role == UserRole.User)
-                    .Select(u => u.Email.Value)
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .ToList();
+                var meters = await smartMeterRepository.GetAllPairedAsync(ct);
+                var meterByDevice = meters
+                    .Where(x => !string.IsNullOrWhiteSpace(x.DeviceUUID))
+                    .ToDictionary(x => x.DeviceUUID!, StringComparer.OrdinalIgnoreCase);
+                var users = (await userRepository.GetAllAsync(ct)).ToDictionary(x => x.Id.Value);
 
-                if (recipients.Count == 0)
+                foreach (var bill in bills)
                 {
-                    logger.LogInformation("No consumer recipients found for monthly billing email.");
-                    return;
-                }
+                    if (!meterByDevice.TryGetValue(bill.DeviceId, out var meter))
+                    {
+                        logger.LogWarning(
+                            "No paired smart meter found for device {DeviceId}; bill email skipped.",
+                            bill.DeviceId);
+                        continue;
+                    }
 
-                var totalAmount = bills.Sum(x => x.TotalCost);
-                var body = new StringBuilder()
-                    .AppendLine("Postovani,")
-                    .AppendLine()
-                    .AppendLine($"Automatizovani mesecni obracun je zavrsen za period {year:D4}-{month:D2}.")
-                    .AppendLine($"Generisano racuna: {bills.Count}")
-                    .AppendLine($"Ukupan obracunat iznos (RSD): {totalAmount:F2}")
-                    .AppendLine()
-                    .AppendLine("Detalji racuna su dostupni u SmartGrid aplikaciji.")
-                    .ToString();
+                    var property = await propertyRepository.GetByIdAsync(meter.PropertyId, ct);
+                    if (property is null || !users.TryGetValue(property.UserId, out var owner))
+                    {
+                        logger.LogWarning(
+                            "No owner found for device {DeviceId}; bill email skipped.",
+                            bill.DeviceId);
+                        continue;
+                    }
 
-                foreach (var recipient in recipients)
-                {
+                    var textBody = new StringBuilder()
+                        .AppendLine("Postovani,")
+                        .AppendLine()
+                        .Append(bill.BillText)
+                        .ToString();
+
+                    var htmlBody = new StringBuilder()
+                        .AppendLine("<p>Postovani,</p>")
+                        .Append("<pre style=\"font-family: monospace; white-space: pre-wrap;\">")
+                        .Append(WebUtility.HtmlEncode(bill.BillText))
+                        .AppendLine("</pre>")
+                        .ToString();
+
                     await emailService.SendEmailAsync(
-                        recipient,
-                        $"SmartGrid - Mesecni obracun {year:D4}-{month:D2}",
-                        body,
+                        owner.Email.Value,
+                        $"SmartGrid - Mesecni racun {year:D4}-{month:D2}",
+                        textBody,
+                        htmlBody,
                         ct);
-                }
 
+                    logger.LogInformation(
+                        "Monthly bill email sent to {Email} for device {DeviceId}. Period: {Year}-{Month}.",
+                        owner.Email.Value,
+                        bill.DeviceId,
+                        year,
+                        month);
+                }
             }
             catch (Exception ex)
             {
@@ -192,9 +243,7 @@ namespace SmartGrid.Application.Features.Billing.Commands
             var higherCoef = totalKwh <= 0 ? 0 : higherKwh / totalKwh;
             var lowerCoef = totalKwh <= 0 ? 0 : lowerKwh / totalKwh;
 
-            var greenTotal = Math.Min(totalKwh, 350);
-            var blueTotal = Math.Max(0, Math.Min(totalKwh - 350, 850));
-            var redTotal = Math.Max(0, totalKwh - 1200);
+            var (greenTotal, blueTotal, redTotal) = ZoneConsumptionCalculator.SplitIntoZones(totalKwh, tariffModel);
 
             var greenVt = greenTotal * higherCoef;
             var greenNt = greenTotal * lowerCoef;

@@ -20,15 +20,14 @@ import {
 import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
 import AdminRoute from "../../components/admin/AdminRoute";
 import PageShell from "../../components/layout/PageShell";
-import MockDataBanner from "../../components/layout/MockDataBanner";
 import StatCard from "../../components/layout/StatCard";
-import { getBillingRuns, runMonthlyBilling } from "../../services/admin/AdminMockService";
+import { getBillingRuns, runMonthlyBilling } from "../../api_services/admin/AdminAPIService";
 import type { AdminGeneratedBill, BillingRun } from "../../types/admin/BillingRun";
 
 function AdminBillingPageContent() {
     const now = new Date();
     const [year, setYear] = useState(now.getFullYear());
-    const [month, setMonth] = useState(now.getMonth() === 0 ? 12 : now.getMonth());
+    const [month, setMonth] = useState(now.getMonth() + 1);
     const [runs, setRuns] = useState<BillingRun[]>([]);
     const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
     const [selectedBillIndex, setSelectedBillIndex] = useState<number | null>(null);
@@ -75,10 +74,10 @@ function AdminBillingPageContent() {
             setSelectedRunId(run.id);
             setSelectedBillIndex(run.bills.length > 0 ? 0 : null);
             setMessage(
-                `Obracun zavrsen: ${run.generatedBills} racuna generisano, ${run.emailsSent} emailova poslato (mock).`
+                `Obracun zavrsen: ${run.generatedBills} racuna generisano, ${run.emailsSent} emailova poslato.`
             );
-        } catch {
-            setError("Neuspesno pokretanje mesecnog obracuna.");
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Neuspesno pokretanje mesecnog obracuna.");
         } finally {
             setIsRunning(false);
         }
@@ -87,11 +86,8 @@ function AdminBillingPageContent() {
     return (
         <PageShell
             title="Automatizovan mesecni obracun"
-            subtitle="Simulacija generisanja racuna na osnovu VT/NT potrosnje i tarifnih zona."
+            subtitle="Generisanje racuna na osnovu VT/NT potrosnje i tarifnih zona."
             maxWidth="xl"
-            banner={
-                <MockDataBanner message="Test podaci — obracun se izvrsava lokalno prema mock merenjima i sacuvanom tarifnom modelu." />
-            }
         >
             <Paper
                 elevation={0}

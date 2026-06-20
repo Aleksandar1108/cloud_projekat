@@ -1,4 +1,5 @@
-﻿using Azure.Data.Tables;
+﻿using Azure;
+using Azure.Data.Tables;
 using Microsoft.Extensions.Options;
 using SmartGrid.Application.Interfaces.Repositories;
 using SmartGrid.Domain.Enums;
@@ -23,7 +24,18 @@ namespace SmartGrid.Infrastructure.Persistence.AzureTable.Repositories
     {
         public async Task<IReadOnlyCollection<DeviceStatus>> GetAllAsync(CancellationToken ct = default)
         {
-            return await base.QueryAsync(string.Empty, ct);
+            try
+            {
+                return await base.QueryAsync(string.Empty, ct);
+            }
+            catch (RequestFailedException ex) when (ex.Status == 404)
+            {
+                return Array.Empty<DeviceStatus>();
+            }
+            catch (Exception)
+            {
+                return Array.Empty<DeviceStatus>();
+            }
         }
 
         public async Task<DeviceStatus?> GetByIdAsync(DeviceType type, EntityId deviceId, CancellationToken ct = default)

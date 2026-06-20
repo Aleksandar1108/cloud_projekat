@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <CopyRetryCount>30</CopyRetryCount>
+    <CopyRetryDelayMilliseconds>300</CopyRetryDelayMilliseconds>
+  </PropertyGroup>
+
+  <!-- Prevents MSB3027/MSB3021 when rebuilding while a local exe host is still running. -->
+  <Target Name="StopRunningInstanceBeforeBuild"
+          BeforeTargets="PrepareForBuild"
+          Condition="'$(DesignTimeBuild)' != 'true' and '$(OutputType)' == 'Exe' and '$(Configuration)' == 'Debug'">
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;Get-Process -Name '$(AssemblyName)' -ErrorAction SilentlyContinue | Stop-Process -Force&quot;"
+          IgnoreExitCode="true"
+          ContinueOnError="true" />
+  </Target>
+</Project>

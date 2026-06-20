@@ -22,9 +22,7 @@ namespace SmartGrid.Application.Common
             var higherCoef = 0.65;
             var lowerCoef = 0.35;
 
-            var greenTotal = Math.Min(totalKwh, 350);
-            var blueTotal = Math.Max(0, Math.Min(totalKwh - 350, 850));
-            var redTotal = Math.Max(0, totalKwh - 1200);
+            var (greenTotal, blueTotal, redTotal) = ZoneConsumptionCalculator.SplitIntoZones(totalKwh, tariff);
 
             var greenVt = greenTotal * higherCoef;
             var greenNt = greenTotal * lowerCoef;

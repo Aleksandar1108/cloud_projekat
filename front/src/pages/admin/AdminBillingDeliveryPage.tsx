@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import {
     Alert,
     Box,
-    Button,
     Chip,
     CircularProgress,
     Grid,
@@ -17,16 +16,13 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import RestartAltRoundedIcon from "@mui/icons-material/RestartAltRounded";
 import AdminRoute from "../../components/admin/AdminRoute";
 import PageShell from "../../components/layout/PageShell";
-import MockDataBanner from "../../components/layout/MockDataBanner";
 import StatCard from "../../components/layout/StatCard";
 import {
     getBillingDeliveryStats,
     getEmailDeliveryLogs,
-    resetAdminMockData,
-} from "../../services/admin/AdminMockService";
+} from "../../api_services/admin/AdminAPIService";
 import type { BillingDeliveryStats, EmailDeliveryLog } from "../../types/admin/EmailDelivery";
 
 function AdminBillingDeliveryPageContent() {
@@ -34,8 +30,6 @@ function AdminBillingDeliveryPageContent() {
     const [logs, setLogs] = useState<EmailDeliveryLog[]>([]);
     const [statusFilter, setStatusFilter] = useState<"All" | "Sent" | "Failed">("All");
     const [isLoading, setIsLoading] = useState(true);
-    const [isResetting, setIsResetting] = useState(false);
-    const [message, setMessage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -59,20 +53,6 @@ function AdminBillingDeliveryPageContent() {
         }
     };
 
-    const handleReset = async () => {
-        setIsResetting(true);
-        setMessage(null);
-        try {
-            await resetAdminMockData();
-            await loadData();
-            setMessage("Mock podaci su resetovani na pocetne vrednosti.");
-        } catch {
-            setError("Neuspesno resetovanje mock podataka.");
-        } finally {
-            setIsResetting(false);
-        }
-    };
-
     const filteredLogs =
         statusFilter === "All" ? logs : logs.filter((log) => log.status === statusFilter);
 
@@ -81,9 +61,6 @@ function AdminBillingDeliveryPageContent() {
             title="Slanje racuna emailom"
             subtitle="Nadzor broja uspesno generisanih i poslatih racuna potrosacima."
             maxWidth="xl"
-            banner={
-                <MockDataBanner message="Test podaci — statistika se azurira nakon pokretanja mesecnog obracuna." />
-            }
         >
             {isLoading && (
                 <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
@@ -91,7 +68,6 @@ function AdminBillingDeliveryPageContent() {
                 </Box>
             )}
             {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>}
-            {message && <Alert severity="success" sx={{ mb: 2, borderRadius: 2 }}>{message}</Alert>}
 
             {stats && (
                 <>
@@ -116,28 +92,18 @@ function AdminBillingDeliveryPageContent() {
             )}
 
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1.5, gap: 2, flexWrap: "wrap" }}>
-                <Typography variant="h6">Log slanja emailova</Typography>
-                <Box sx={{ display: "flex", gap: 1 }}>
-                    <TextField
-                        select
-                        size="small"
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
-                        sx={{ minWidth: 150 }}
-                    >
-                        <MenuItem value="All">Svi</MenuItem>
-                        <MenuItem value="Sent">Poslato</MenuItem>
-                        <MenuItem value="Failed">Neuspelo</MenuItem>
-                    </TextField>
-                    <Button
-                        variant="outlined"
-                        startIcon={<RestartAltRoundedIcon />}
-                        disabled={isResetting}
-                        onClick={() => void handleReset()}
-                    >
-                        {isResetting ? "Reset..." : "Reset mock podataka"}
-                    </Button>
-                </Box>
+                <Typography variant="h6">Pregled poslatih racuna</Typography>
+                <TextField
+                    select
+                    size="small"
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
+                    sx={{ minWidth: 150 }}
+                >
+                    <MenuItem value="All">Svi</MenuItem>
+                    <MenuItem value="Sent">Poslato</MenuItem>
+                    <MenuItem value="Failed">Neuspelo</MenuItem>
+                </TextField>
             </Box>
 
             <TableContainer
@@ -153,14 +119,13 @@ function AdminBillingDeliveryPageContent() {
                             <TableCell>Email</TableCell>
                             <TableCell>Period</TableCell>
                             <TableCell>Status</TableCell>
-                            <TableCell>Napomena</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {filteredLogs.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={6} sx={{ color: "text.secondary" }}>
-                                    Nema logova za izabrani filter.
+                                <TableCell colSpan={5} sx={{ color: "text.secondary" }}>
+                                    Nema podataka za izabrani filter.
                                 </TableCell>
                             </TableRow>
                         )}
@@ -178,7 +143,6 @@ function AdminBillingDeliveryPageContent() {
                                         variant="outlined"
                                     />
                                 </TableCell>
-                                <TableCell>{log.errorMessage ?? "—"}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

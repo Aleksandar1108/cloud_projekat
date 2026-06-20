@@ -12,8 +12,7 @@ import {
 import SaveRoundedIcon from "@mui/icons-material/SaveRounded";
 import AdminRoute from "../../components/admin/AdminRoute";
 import PageShell from "../../components/layout/PageShell";
-import MockDataBanner from "../../components/layout/MockDataBanner";
-import { getTariffModel, saveTariffModel } from "../../services/admin/AdminMockService";
+import { getTariffModel, saveTariffModel } from "../../api_services/admin/AdminAPIService";
 import type { TariffModel } from "../../types/admin/TariffModel";
 
 const zoneMeta = {
@@ -67,7 +66,7 @@ function TariffModelsPageContent() {
         setError(null);
         try {
             setModel(await saveTariffModel(model));
-            setMessage("Tarifni model je sacuvan (mock podaci u localStorage).");
+            setMessage("Tarifni model je sacuvan.");
         } catch {
             setError("Neuspesno cuvanje tarifnog modela.");
         } finally {
@@ -79,7 +78,6 @@ function TariffModelsPageContent() {
         <PageShell
             title="Tarifni modeli"
             subtitle="Definisanje cena VT/NT i pragova za zelenu, plavu i crvenu zonu potrosnje."
-            banner={<MockDataBanner />}
         >
             {isLoading && (
                 <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>

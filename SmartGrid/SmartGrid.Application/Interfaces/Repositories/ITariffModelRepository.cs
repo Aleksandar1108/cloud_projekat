@@ -1,3 +1,5 @@
+using SmartGrid.Application.Features.Admin;
+
 namespace SmartGrid.Application.Interfaces.Repositories
 {
     public record TariffModelSettings(
@@ -9,11 +11,15 @@ namespace SmartGrid.Application.Interfaces.Repositories
         double RedZoneNtPrice,
         double NetworkCostPerKw,
         double SupplierCost,
-        double ApprovedPowerKw
+        double ApprovedPowerKw,
+        double GreenZoneMaxKwh,
+        double BlueZoneMaxKwh
     );
 
     public interface ITariffModelRepository
     {
         Task<TariffModelSettings?> GetActiveAsync(CancellationToken ct = default);
+        Task<TariffModelDto> GetAdminModelAsync(CancellationToken ct = default);
+        Task<TariffModelDto> SaveAdminModelAsync(TariffModelDto model, CancellationToken ct = default);
     }
 }

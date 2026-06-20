@@ -39,7 +39,10 @@ CREATE TABLE TariffModels (
   redZoneNtPrice FLOAT NOT NULL,
   networkCostPerKw FLOAT NOT NULL,
   supplierCost FLOAT NOT NULL,
-  approvedPowerKw FLOAT NOT NULL
+  approvedPowerKw FLOAT NOT NULL,
+  greenZoneMaxKwh FLOAT NOT NULL DEFAULT 350,
+  blueZoneMaxKwh FLOAT NOT NULL DEFAULT 1200,
+  updatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE()
 );
 
 -- Razmotritii dodavanje kaskadnog brisanja (pogotovo zbog user-a)

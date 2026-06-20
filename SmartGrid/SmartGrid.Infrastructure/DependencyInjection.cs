@@ -43,6 +43,7 @@ namespace SmartGrid.Infrastructure
 
             services.AddScoped<IJwtTokenService, JWTTokenService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddHostedService<AzureStorageInitializer>();
 
             return services;
         }
