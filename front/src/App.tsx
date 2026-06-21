@@ -18,6 +18,7 @@ import TariffModelsPage from './pages/admin/TariffModelsPage'
 import AdminBillingPage from './pages/admin/AdminBillingPage'
 import AdminNetworkPage from './pages/admin/AdminNetworkPage'
 import AdminBillingDeliveryPage from './pages/admin/AdminBillingDeliveryPage'
+import AdminUsersPage from './pages/admin/AdminUsersPage'
 
 function App() {
 
@@ -38,6 +39,7 @@ function App() {
           <Route path='/admin/billing' element={<AdminBillingPage />}></Route>
           <Route path='/admin/network' element={<AdminNetworkPage />}></Route>
           <Route path='/admin/delivery' element={<AdminBillingDeliveryPage />}></Route>
+          <Route path='/admin/users' element={<AdminUsersPage />}></Route>
           <Route path="*" element={<Navigate to="/404" replace />} />
 
         </Route>

@@ -104,6 +104,12 @@ function LoginPage() {
                             Zaboravili ste lozinku?
                         </Link>
                     </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center" }}>
+                        Nemate nalog?{" "}
+                        <Link component="button" underline="hover" onClick={() => navigate("/users")}>
+                            Registracija
+                        </Link>
+                    </Typography>
                 </Stack>
             </Paper>
         </Box>

@@ -26,10 +26,13 @@ import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
 import CalculateRoundedIcon from "@mui/icons-material/CalculateRounded";
 import DeviceHubRoundedIcon from "@mui/icons-material/DeviceHubRounded";
 import MarkEmailReadRoundedIcon from "@mui/icons-material/MarkEmailReadRounded";
+import ManageAccountsRoundedIcon from "@mui/icons-material/ManageAccountsRounded";
+import PersonAddRoundedIcon from "@mui/icons-material/PersonAddRounded";
 import BoltRoundedIcon from "@mui/icons-material/BoltRounded";
 import LoginButton from "../auth/LoginButton";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { useIsBillingAdmin } from "../../hooks/admin/useIsBillingAdmin";
+import { useIsSysAdmin } from "../../hooks/admin/useIsSysAdmin";
 
 const drawerWidth = 280;
 
@@ -38,6 +41,7 @@ type NavItem = {
     path: string;
     icon: React.ReactNode;
     adminOnly?: boolean;
+    sysAdminOnly?: boolean;
 };
 
 const baseNavItems: NavItem[] = [
@@ -45,6 +49,11 @@ const baseNavItems: NavItem[] = [
     { label: "Objekti", path: "/properties", icon: <ApartmentRoundedIcon /> },
     { label: "Telemetrija", path: "/telemetry-analytics", icon: <InsightsRoundedIcon /> },
     { label: "Racuni", path: "/monthly-billing", icon: <ReceiptLongRoundedIcon /> },
+    { label: "Register", path: "/users", icon: <PersonAddRoundedIcon /> },
+];
+
+const sysAdminNavItems: NavItem[] = [
+    { label: "Korisnici", path: "/admin/users", icon: <ManageAccountsRoundedIcon />, sysAdminOnly: true },
 ];
 
 const adminNavItems: NavItem[] = [
@@ -130,8 +139,9 @@ function SidebarContent({
     userLabel?: string;
     userRole?: string;
 }) {
-    const consumerItems = navItems.filter((item) => !item.adminOnly);
+    const consumerItems = navItems.filter((item) => !item.adminOnly && !item.sysAdminOnly);
     const adminItems = navItems.filter((item) => item.adminOnly);
+    const sysAdminItems = navItems.filter((item) => item.sysAdminOnly);
 
     return (
         <Box
@@ -221,6 +231,25 @@ function SidebarContent({
                         <NavList items={adminItems} currentPath={currentPath} onNavigate={onNavigate} />
                     </>
                 )}
+
+                {sysAdminItems.length > 0 && (
+                    <>
+                        <Typography
+                            sx={{
+                                px: 2.5,
+                                pt: 1.5,
+                                pb: 0.5,
+                                fontSize: "0.72rem",
+                                letterSpacing: "0.08em",
+                                fontWeight: 700,
+                                color: "rgba(255,255,255,0.58)",
+                            }}
+                        >
+                            SISTEM ADMIN
+                        </Typography>
+                        <NavList items={sysAdminItems} currentPath={currentPath} onNavigate={onNavigate} />
+                    </>
+                )}
             </Box>
 
             {userLabel && (
@@ -279,13 +308,21 @@ export default function DrawerAppBar() {
     const location = useLocation();
     const { isAuthenticated, user } = useAuth();
     const isBillingAdmin = useIsBillingAdmin();
+    const isSysAdmin = useIsSysAdmin();
 
     const navItems = React.useMemo(() => {
+        const items = [...baseNavItems];
+
         if (isAuthenticated && isBillingAdmin) {
-            return [...baseNavItems, ...adminNavItems];
+            items.push(...adminNavItems);
         }
-        return baseNavItems;
-    }, [isAuthenticated, isBillingAdmin]);
+
+        if (isAuthenticated && isSysAdmin) {
+            items.push(...sysAdminNavItems);
+        }
+
+        return items;
+    }, [isAuthenticated, isBillingAdmin, isSysAdmin]);
 
     const handleNavigate = (path: string) => {
         navigate(path);

@@ -60,5 +60,17 @@ namespace SmartGrid.Domain.Models
                 ActivationStatus.NotActivated()
             );
         }
+
+        public static User CreateManaged(string email, string password, UserRole role, bool activated = true)
+        {
+            return new User(
+                UserId.New(),
+                Email.Create(email).Value,
+                role,
+                PasswordHash.FromPlainPassword(password),
+                DateTime.UtcNow,
+                activated ? ActivationStatus.Activated() : ActivationStatus.NotActivated()
+            );
+        }
     }
 }

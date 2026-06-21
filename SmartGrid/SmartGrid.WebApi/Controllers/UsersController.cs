@@ -4,7 +4,6 @@ using SmartGrid.Application.Features.Users.Command;
 using SmartGrid.Application.Features.Users.Queries;
 using SmartGrid.WebApi.DTOs;
 using SmartGrid.WebApi.Extensions;
-using System.Linq;
 
 namespace SmartGrid.WebApi.Controllers;
 
@@ -81,37 +80,29 @@ public class UsersController(IMediator mediator) : ControllerBase
     [HttpGet("")]
     public async Task<IActionResult> GetUsers(CancellationToken ct)
     {
-        var command = new GetUsersQuery();
-
-        var result = await mediator.Send(command, ct);
-
+        var result = await mediator.Send(new GetUsersQuery(), ct);
         return result.ToActionResult();
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteUser(
-    [FromRoute] string id,
-    CancellationToken ct)
+    public async Task<IActionResult> DeleteUser([FromRoute] string id, CancellationToken ct)
     {
-        var command = new DeleteUserCommand(id);
-
-        var result = await mediator.Send(command, ct);
-
+        var result = await mediator.Send(new DeleteUserCommand(id), ct);
         return result.ToActionResult();
     }
 
-    [HttpPatch("{userID}/role")]
-    public async Task<IActionResult> ChangeRole([FromRoute] string userId,[FromBody] ChangeRoleRequestDTO request, CancellationToken ct)
+    [HttpPatch("{userId}/role")]
+    public async Task<IActionResult> ChangeRole(
+        [FromRoute] string userId,
+        [FromBody] ChangeRoleRequestDTO request,
+        CancellationToken ct)
     {
         if (request is null)
         {
             return BadRequest(new { message = "Invalid or empty JSON payload." });
         }
 
-        var command = new ChangeUserRoleCommand(userId, request.NewRole);
-
-        var result = await mediator.Send(command, ct);
-
+        var result = await mediator.Send(new ChangeUserRoleCommand(userId, request.NewRole), ct);
         return result.ToActionResult();
     }
 }
