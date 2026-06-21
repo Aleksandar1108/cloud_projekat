@@ -18,6 +18,7 @@ import TariffModelsPage from './pages/admin/TariffModelsPage'
 import AdminBillingPage from './pages/admin/AdminBillingPage'
 import AdminNetworkPage from './pages/admin/AdminNetworkPage'
 import AdminBillingDeliveryPage from './pages/admin/AdminBillingDeliveryPage'
+import AdminManualReadingsPage from './pages/admin/AdminManualReadingsPage'
 import AdminUsersPage from './pages/admin/AdminUsersPage'
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
           <Route path='/telemetry-analytics' element={<TelemetryAnalyticsPage />}></Route>
           <Route path='/admin/tariffs' element={<TariffModelsPage />}></Route>
           <Route path='/admin/billing' element={<AdminBillingPage />}></Route>
+          <Route path='/admin/manual-readings' element={<AdminManualReadingsPage />}></Route>
           <Route path='/admin/network' element={<AdminNetworkPage />}></Route>
           <Route path='/admin/delivery' element={<AdminBillingDeliveryPage />}></Route>
           <Route path='/admin/users' element={<AdminUsersPage />}></Route>

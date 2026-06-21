@@ -8,6 +8,7 @@ namespace SmartGrid.Application.Interfaces.Repositories
         Task<SmartMeter?> GetByIdAsync(Guid id, CancellationToken ct = default);
         Task<SmartMeter?> GetBySerialNumberAsync(string serialNumber, CancellationToken ct = default);
         Task<SmartMeter?> GetByDeviceUUIDAsync(string deviceUUID, CancellationToken ct = default);
+        Task<SmartMeter?> GetPairedByLabelAsync(string label, CancellationToken ct = default);
         Task<IReadOnlyCollection<SmartMeter>> GetAllPairedAsync(CancellationToken ct = default);
         Task AddAsync(SmartMeter smartMeter, CancellationToken ct = default);
         Task UpdateAsync(SmartMeter smartMeter, CancellationToken ct = default);

@@ -22,7 +22,7 @@ namespace SmartGrid.WebApi.Controllers
             }
 
             var command = new SubmitManualReadingCommand(
-                request.DeviceId,
+                request.MeterName,
                 request.ReadingKwh,
                 request.ReadingAtUtc == default ? DateTime.UtcNow : request.ReadingAtUtc,
                 request.SubmitterEmail,
@@ -44,13 +44,6 @@ namespace SmartGrid.WebApi.Controllers
             }
 
             var result = await mediator.Send(new GetManualReadingsQuery(parsed));
-            return result.ToActionResult();
-        }
-
-        [HttpPost("{id:guid}/approve")]
-        public async Task<IActionResult> Approve(Guid id)
-        {
-            var result = await mediator.Send(new ApproveManualReadingCommand(id));
             return result.ToActionResult();
         }
     }

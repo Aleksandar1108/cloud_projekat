@@ -56,6 +56,26 @@ namespace SmartGrid.Infrastructure.Persistence.SQLDatabase.Repositories
             return entity is null ? null : _mapper.ToDomain(entity);
         }
 
+        public async Task<SmartMeter?> GetPairedByLabelAsync(string label, CancellationToken ct = default)
+        {
+            if (string.IsNullOrWhiteSpace(label))
+            {
+                return null;
+            }
+
+            var pairedStatus = PairingStatus.Paired.ToString();
+            var normalized = label.Trim().ToLowerInvariant();
+            var entity = await _context.SmartMeters
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    x => x.PairingStatus == pairedStatus
+                         && x.DeviceUUID != null
+                         && x.Label.ToLower() == normalized,
+                    ct);
+
+            return entity is null ? null : _mapper.ToDomain(entity);
+        }
+
         public async Task<IReadOnlyCollection<SmartMeter>> GetAllPairedAsync(CancellationToken ct = default)
         {
             var pairedStatus = PairingStatus.Paired.ToString();

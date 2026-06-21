@@ -9,6 +9,7 @@ namespace SmartGrid.Application.Interfaces.Repositories
         Task<ManualReadingDto?> GetByIdAsync(Guid id, CancellationToken ct = default);
         Task<IReadOnlyCollection<ManualReadingDto>> GetAllAsync(ManualReadingStatus? status = null, CancellationToken ct = default);
         Task<bool> MarkProcessedAsync(Guid id, CancellationToken ct = default);
+        Task<bool> DeletePendingAsync(Guid id, CancellationToken ct = default);
         Task<IReadOnlyCollection<ManualReadingDto>> GetProcessedByPeriodAsync(DateTime periodStartUtc, DateTime periodEndUtc, CancellationToken ct = default);
     }
 }

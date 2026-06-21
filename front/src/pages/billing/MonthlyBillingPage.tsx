@@ -78,7 +78,7 @@ function MonthlyBillingPage() {
             <section style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
                 <div>
                     <h1 style={{ margin: 0, fontSize: "42px" }}>Mesecni obracun</h1>
-                    <p>Pregled i detalji svih generisanih racuna.</p>
+                    <p>Pregled neplacenih racuna spremnih za placanje.</p>
                 </div>
                 <div style={{ display: "flex", gap: "10px" }}>
                     <button
@@ -159,7 +159,7 @@ function MonthlyBillingPage() {
                     <tbody>
                         {filteredBills.length === 0 && (
                             <tr>
-                                <td colSpan={6} style={{ padding: "16px", color: "#6b7280" }}>Nema dostupnih racuna.</td>
+                                <td colSpan={6} style={{ padding: "16px", color: "#6b7280" }}>Nema neplacenih racuna.</td>
                             </tr>
                         )}
                         {filteredBills.map((bill, index) => (

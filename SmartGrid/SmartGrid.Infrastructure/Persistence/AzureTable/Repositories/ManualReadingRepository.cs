@@ -57,6 +57,15 @@ namespace SmartGrid.Infrastructure.Persistence.AzureTable.Repositories
             return true;
         }
 
+        public async Task<bool> DeletePendingAsync(Guid id, CancellationToken ct = default)
+        {
+            var existing = await base.GetByIdAsync(ManualReadingStatus.Pending.ToString(), id.ToString(), ct);
+            if (existing is null) return false;
+
+            await _manualReadingsTableClient.DeleteEntityAsync(ManualReadingStatus.Pending.ToString(), id.ToString(), cancellationToken: ct);
+            return true;
+        }
+
         public async Task<IReadOnlyCollection<ManualReadingDto>> GetProcessedByPeriodAsync(DateTime periodStartUtc, DateTime periodEndUtc, CancellationToken ct = default)
         {
             var processed = await base.QueryByPartitionKeyAsync(ManualReadingStatus.Processed.ToString(), ct);

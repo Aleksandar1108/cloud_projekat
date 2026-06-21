@@ -12,6 +12,7 @@ namespace SmartGrid.Infrastructure.Persistence.AzureTable.Mappers
             return new ManualReadingTableEntity
             {
                 DeviceId = domain.DeviceId,
+                MeterName = domain.MeterName,
                 ReadingKwh = domain.ReadingKwh,
                 ReadingAtUtc = domain.ReadingAtUtc,
                 SubmitterEmail = domain.SubmitterEmail,
@@ -28,6 +29,7 @@ namespace SmartGrid.Infrastructure.Persistence.AzureTable.Mappers
             return new ManualReadingDto(
                 Guid.Parse(entity.RowKey),
                 entity.DeviceId,
+                string.IsNullOrWhiteSpace(entity.MeterName) ? entity.DeviceId : entity.MeterName,
                 entity.ReadingKwh,
                 entity.ReadingAtUtc,
                 entity.SubmitterEmail,

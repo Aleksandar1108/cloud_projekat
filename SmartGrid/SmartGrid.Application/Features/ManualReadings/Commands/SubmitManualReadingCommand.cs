@@ -9,7 +9,7 @@ using SmartGrid.Domain.Enums;
 namespace SmartGrid.Application.Features.ManualReadings.Commands
 {
     public record SubmitManualReadingCommand(
-        string DeviceId,
+        string MeterName,
         double ReadingKwh,
         DateTime ReadingAtUtc,
         string SubmitterEmail,
@@ -20,14 +20,23 @@ namespace SmartGrid.Application.Features.ManualReadings.Commands
     internal class SubmitManualReadingHandler(
         IManualReadingRepository manualReadingRepository,
         IManualReadingImageStorage manualReadingImageStorage,
-        IImageOptimizationService imageOptimizationService)
+        IImageOptimizationService imageOptimizationService,
+        ISmartMeterRepository smartMeterRepository)
         : IRequestHandler<SubmitManualReadingCommand, Result<ManualReadingDto>>
     {
         public async Task<Result<ManualReadingDto>> Handle(SubmitManualReadingCommand request, CancellationToken ct)
         {
-            if (string.IsNullOrWhiteSpace(request.DeviceId) || request.ReadingKwh <= 0 || request.ImageContent.Length == 0)
+            if (string.IsNullOrWhiteSpace(request.MeterName) || request.ReadingKwh <= 0 || request.ImageContent.Length == 0)
             {
-                return Result<ManualReadingDto>.Failure("DeviceId, ReadingKwh and image are required.", ErrorType.Validation);
+                return Result<ManualReadingDto>.Failure("Naziv brojila, ocitano stanje i slika su obavezni.", ErrorType.Validation);
+            }
+
+            var meter = await smartMeterRepository.GetPairedByLabelAsync(request.MeterName, ct);
+            if (meter is null || string.IsNullOrWhiteSpace(meter.DeviceUUID))
+            {
+                return Result<ManualReadingDto>.Failure(
+                    "Brojilo sa tim nazivom nije pronadjeno ili nije upareno.",
+                    ErrorType.NotFound);
             }
 
             var readingId = Guid.NewGuid();
@@ -67,7 +76,8 @@ namespace SmartGrid.Application.Features.ManualReadings.Commands
             var created = await manualReadingRepository.CreateAsync(
                 new ManualReadingDto(
                     readingId,
-                    request.DeviceId,
+                    meter.DeviceUUID,
+                    meter.Label,
                     request.ReadingKwh,
                     request.ReadingAtUtc.ToUniversalTime(),
                     request.SubmitterEmail,

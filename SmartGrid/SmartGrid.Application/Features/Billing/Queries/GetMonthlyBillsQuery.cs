@@ -11,6 +11,7 @@ namespace SmartGrid.Application.Features.Billing.Queries
 
     internal class GetMonthlyBillsHandler(
         IMonthlyBillRepository monthlyBillRepository,
+        IPaymentRepository paymentRepository,
         ILogger<GetMonthlyBillsHandler> logger)
         : IRequestHandler<GetMonthlyBillsQuery, Result<IReadOnlyCollection<MonthlyBillDto>>>
     {
@@ -24,7 +25,14 @@ namespace SmartGrid.Application.Features.Billing.Queries
             try
             {
                 var bills = await monthlyBillRepository.GetByPeriodAsync(request.Year, request.Month, ct);
-                return Result<IReadOnlyCollection<MonthlyBillDto>>.Success(bills);
+                var paidDeviceIds = await paymentRepository.GetPaidDeviceIdsForPeriodAsync(request.Year, request.Month, ct);
+                var paidDevices = paidDeviceIds.ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+                var unpaidBills = bills
+                    .Where(bill => !paidDevices.Contains(bill.DeviceId))
+                    .ToList();
+
+                return Result<IReadOnlyCollection<MonthlyBillDto>>.Success(unpaidBills);
             }
             catch (Exception ex)
             {

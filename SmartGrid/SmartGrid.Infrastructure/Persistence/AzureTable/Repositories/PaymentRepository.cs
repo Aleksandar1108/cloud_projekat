@@ -57,6 +57,31 @@ namespace SmartGrid.Infrastructure.Persistence.AzureTable.Repositories
                 return Array.Empty<PaymentDto>();
             }
         }
+
+        public async Task<IReadOnlyCollection<string>> GetPaidDeviceIdsForPeriodAsync(int year, int month, CancellationToken ct = default)
+        {
+            try
+            {
+                var partitionKey = $"{year:D4}-{month:D2}";
+                var paidStatus = (int)PaymentStatus.Paid;
+                var filter = $"PartitionKey eq '{partitionKey}' and Status eq {paidStatus}";
+                var results = await base.QueryAsync(filter, ct);
+
+                return results
+                    .Where(x => x.Status == PaymentStatus.Paid)
+                    .Select(x => x.DeviceId)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+            }
+            catch (RequestFailedException ex) when (ex.Status == 404)
+            {
+                return Array.Empty<string>();
+            }
+            catch (Exception)
+            {
+                return Array.Empty<string>();
+            }
+        }
     }
 }
 

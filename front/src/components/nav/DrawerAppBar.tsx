@@ -27,6 +27,7 @@ import CalculateRoundedIcon from "@mui/icons-material/CalculateRounded";
 import DeviceHubRoundedIcon from "@mui/icons-material/DeviceHubRounded";
 import MarkEmailReadRoundedIcon from "@mui/icons-material/MarkEmailReadRounded";
 import ManageAccountsRoundedIcon from "@mui/icons-material/ManageAccountsRounded";
+import FactCheckRoundedIcon from "@mui/icons-material/FactCheckRounded";
 import PersonAddRoundedIcon from "@mui/icons-material/PersonAddRounded";
 import BoltRoundedIcon from "@mui/icons-material/BoltRounded";
 import LoginButton from "../auth/LoginButton";
@@ -59,6 +60,7 @@ const sysAdminNavItems: NavItem[] = [
 const adminNavItems: NavItem[] = [
     { label: "Tarifni modeli", path: "/admin/tariffs", icon: <TuneRoundedIcon />, adminOnly: true },
     { label: "Mesecni obracun", path: "/admin/billing", icon: <CalculateRoundedIcon />, adminOnly: true },
+    { label: "Odobravanje ocitavanja", path: "/admin/manual-readings", icon: <FactCheckRoundedIcon />, adminOnly: true },
     { label: "Status mreze", path: "/admin/network", icon: <DeviceHubRoundedIcon />, adminOnly: true },
     { label: "Email racuni", path: "/admin/delivery", icon: <MarkEmailReadRoundedIcon />, adminOnly: true },
 ];
