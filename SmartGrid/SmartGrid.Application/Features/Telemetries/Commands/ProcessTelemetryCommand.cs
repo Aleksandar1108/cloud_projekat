@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using SmartGrid.Application.Common.Validators;
@@ -105,8 +105,7 @@ namespace SmartGrid.Application.Features.Telemetries.Commands
 
             await telemetryRepository.SaveAsync(telemetry, ct);
 
-            //TODO popraviti
-            //await mediator.Publish( new TelemetryProcessedEvent(telemetry), ct);
+            await mediator.Publish(new TelemetryProcessedEvent(telemetry), ct);
 
             logger.LogInformation(
                 "[TELEMETRY] Telemetry data successfully saved and event published for Device: {DeviceId}",

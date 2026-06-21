@@ -1,7 +1,8 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using SmartGrid.Application.Features.Telemetries.Events;
 using SmartGrid.Application.Interfaces.Repositories;
+using SmartGrid.Domain.Models;
 
 namespace SmartGrid.Application.Features.DeviceStatuses.EventHandlers;
 
@@ -20,16 +21,19 @@ internal class UpdateDeviceStatusHandler(
                 telemetry.DeviceId,
                 ct);
 
+            DeviceStatus status;
             if (device is null)
             {
-                logger.LogWarning("Cannot update status: Device {DeviceId} of type {DeviceType} not found.",
-                    telemetry.DeviceId, telemetry.DeviceType);
-                return;
+                status = DeviceStatus.CreateDefault(telemetry.DeviceId, telemetry.DeviceType, telemetry.Timestamp);
+            }
+            else
+            {
+                status = device.Status;
             }
 
-            device.ProcessTelemetry(telemetry);
+            status.UpdateTelemetry(telemetry);
 
-            await deviceRepository.SaveStatusAsync(device.Status, ct);
+            await deviceRepository.SaveStatusAsync(status, ct);
 
             logger.LogInformation("Successfully updated status for device {DeviceId}.", telemetry.DeviceId);
         }

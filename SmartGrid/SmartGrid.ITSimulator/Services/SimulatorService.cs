@@ -1,4 +1,4 @@
-﻿using SmartGrid.ITSimulator.Enums;
+using SmartGrid.ITSimulator.Enums;
 using SmartGrid.ITSimulator.Models;
 
 namespace SmartGrid.ITSimulator.Services
@@ -15,8 +15,6 @@ namespace SmartGrid.ITSimulator.Services
             _random = new Random();
             _maxPowerVariation = maxPowerVariation;
         }
-
-        private readonly Dictionary<string, DateTime> _lastTimestampByDevice = new();
 
         public TelemetryDTO GenerateTelemetry(
             string deviceId,
@@ -49,19 +47,6 @@ namespace SmartGrid.ITSimulator.Services
 
             _totalConsumptionByDevice[deviceId] += generatedConsumption;
 
-            DateTime timestamp;
-
-            if (!_lastTimestampByDevice.ContainsKey(deviceId))
-            {
-                timestamp = DateTime.UtcNow.AddDays(-5);
-            }
-            else
-            {
-                timestamp = _lastTimestampByDevice[deviceId].AddHours(2);
-            }
-
-            _lastTimestampByDevice[deviceId] = timestamp;
-
             return new TelemetryDTO
             {
                 DeviceId = deviceId,
@@ -70,7 +55,7 @@ namespace SmartGrid.ITSimulator.Services
                 NominalPower = nominalPower,
                 CurrentPower = currentPower,
                 FirmwareVersion = firmwareVersion,
-                Timestamp = timestamp,
+                Timestamp = DateTime.UtcNow,
                 Voltage = voltage,
                 TotalConsumption = Math.Round(_totalConsumptionByDevice[deviceId], 3)
             };
