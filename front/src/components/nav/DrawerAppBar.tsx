@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
     AppBar,
     Avatar,
+    Badge,
     Box,
     Chip,
     Divider,
@@ -21,6 +22,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import ApartmentRoundedIcon from "@mui/icons-material/ApartmentRounded";
 import InsightsRoundedIcon from "@mui/icons-material/InsightsRounded";
+import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
 import CalculateRoundedIcon from "@mui/icons-material/CalculateRounded";
@@ -34,6 +36,7 @@ import LoginButton from "../auth/LoginButton";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { useIsBillingAdmin } from "../../hooks/admin/useIsBillingAdmin";
 import { useIsSysAdmin } from "../../hooks/admin/useIsSysAdmin";
+import { useEmergencyAlertIndicator } from "../../hooks/alerts/useEmergencyAlertIndicator";
 
 const drawerWidth = 280;
 
@@ -49,6 +52,7 @@ const baseNavItems: NavItem[] = [
     { label: "Dashboard", path: "/", icon: <HomeRoundedIcon /> },
     { label: "Objekti", path: "/properties", icon: <ApartmentRoundedIcon /> },
     { label: "Telemetrija", path: "/telemetry-analytics", icon: <InsightsRoundedIcon /> },
+    { label: "Hitna upozorenja", path: "/emergency-alerts", icon: <WarningAmberRoundedIcon /> },
     { label: "Racuni", path: "/monthly-billing", icon: <ReceiptLongRoundedIcon /> },
     { label: "Register", path: "/users", icon: <PersonAddRoundedIcon /> },
 ];
@@ -69,10 +73,12 @@ function NavList({
     items,
     currentPath,
     onNavigate,
+    alertPaths,
 }: {
     items: NavItem[];
     currentPath: string;
     onNavigate: (path: string) => void;
+    alertPaths?: Set<string>;
 }) {
     return (
         <List sx={{ px: 1.5, py: 1 }}>
@@ -80,6 +86,7 @@ function NavList({
                 const active = currentPath === item.path;
                 const textColor = active ? "#e0f2fe" : "#f1f5f9";
                 const iconColor = active ? "#38bdf8" : "#cbd5e1";
+                const showAlertDot = alertPaths?.has(item.path) ?? false;
 
                 return (
                     <ListItemButton
@@ -107,7 +114,20 @@ function NavList({
                                 color: iconColor,
                             }}
                         >
-                            {item.icon}
+                            <Badge
+                                color="error"
+                                variant="dot"
+                                invisible={!showAlertDot}
+                                overlap="circular"
+                                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                                sx={{
+                                    "& .MuiBadge-badge": {
+                                        boxShadow: "0 0 0 2px #111827",
+                                    },
+                                }}
+                            >
+                                {item.icon}
+                            </Badge>
                         </ListItemIcon>
                         <ListItemText
                             primary={item.label}
@@ -134,12 +154,14 @@ function SidebarContent({
     navItems,
     userLabel,
     userRole,
+    alertPaths,
 }: {
     currentPath: string;
     onNavigate: (path: string) => void;
     navItems: NavItem[];
     userLabel?: string;
     userRole?: string;
+    alertPaths?: Set<string>;
 }) {
     const consumerItems = navItems.filter((item) => !item.adminOnly && !item.sysAdminOnly);
     const adminItems = navItems.filter((item) => item.adminOnly);
@@ -213,7 +235,7 @@ function SidebarContent({
                 >
                     POTROSAC
                 </Typography>
-                <NavList items={consumerItems} currentPath={currentPath} onNavigate={onNavigate} />
+                <NavList items={consumerItems} currentPath={currentPath} onNavigate={onNavigate} alertPaths={alertPaths} />
 
                 {adminItems.length > 0 && (
                     <>
@@ -311,6 +333,12 @@ export default function DrawerAppBar() {
     const { isAuthenticated, user } = useAuth();
     const isBillingAdmin = useIsBillingAdmin();
     const isSysAdmin = useIsSysAdmin();
+    const hasEmergencyAlerts = useEmergencyAlertIndicator();
+
+    const alertPaths = React.useMemo(
+        () => (hasEmergencyAlerts ? new Set(["/emergency-alerts"]) : undefined),
+        [hasEmergencyAlerts]
+    );
 
     const navItems = React.useMemo(() => {
         const items = [...baseNavItems];
@@ -338,6 +366,7 @@ export default function DrawerAppBar() {
             navItems={navItems}
             userLabel={isAuthenticated ? user?.username : undefined}
             userRole={user?.role}
+            alertPaths={alertPaths}
         />
     );
 

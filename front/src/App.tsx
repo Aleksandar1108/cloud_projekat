@@ -14,6 +14,7 @@ import ActivateAccountPage from './pages/auth/ActivateAccountPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
 import MainLayout from './layouts/MainLayout'
 import TelemetryAnalyticsPage from './pages/telemetry/TelemetryAnalyticsPage'
+import EmergencyAlertsPage from './pages/alerts/EmergencyAlertsPage'
 import TariffModelsPage from './pages/admin/TariffModelsPage'
 import AdminBillingPage from './pages/admin/AdminBillingPage'
 import AdminNetworkPage from './pages/admin/AdminNetworkPage'
@@ -36,6 +37,7 @@ function App() {
           <Route path='/properties' element={<PropertiesPage />}></Route>
           <Route path='/properties/:id' element={<PropertyDetailPage />}></Route>
           <Route path='/telemetry-analytics' element={<TelemetryAnalyticsPage />}></Route>
+          <Route path='/emergency-alerts' element={<EmergencyAlertsPage />}></Route>
           <Route path='/admin/tariffs' element={<TariffModelsPage />}></Route>
           <Route path='/admin/billing' element={<AdminBillingPage />}></Route>
           <Route path='/admin/manual-readings' element={<AdminManualReadingsPage />}></Route>

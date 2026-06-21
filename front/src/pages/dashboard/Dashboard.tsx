@@ -3,6 +3,7 @@ import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
 import EditNoteRoundedIcon from "@mui/icons-material/EditNoteRounded";
 import LocationCityRoundedIcon from "@mui/icons-material/LocationCityRounded";
 import InsightsRoundedIcon from "@mui/icons-material/InsightsRounded";
+import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
 import CalculateRoundedIcon from "@mui/icons-material/CalculateRounded";
 import DeviceHubRoundedIcon from "@mui/icons-material/DeviceHubRounded";
@@ -47,6 +48,14 @@ const consumerFeatures = [
         icon: <InsightsRoundedIcon />,
         accent: "#1d4ed8",
         accentSoft: "rgba(29, 78, 216, 0.12)",
+    },
+    {
+        title: "Hitna upozorenja",
+        description: "Detekcija pada napona, prekida rada i limiti potrosnje sa email obavestenjima.",
+        path: "/emergency-alerts",
+        icon: <WarningAmberRoundedIcon />,
+        accent: "#dc2626",
+        accentSoft: "rgba(220, 38, 38, 0.12)",
     },
 ];
 
